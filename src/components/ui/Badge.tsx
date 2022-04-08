@@ -12,7 +12,7 @@ interface BadeProps extends ComponentProps<'span'> {
 }
 
 const sizes = {
-	// xxs: 'px-1 py-[1px] text-xs rounded',
+	xxs: 'px-1 py-[1px] text-xs rounded',
 	xs: 'px-2 py-0.5 text-xs rounded',
 	sm: 'px-2 py-0.5 text-xs md:text-sm rounded',
 	md: 'px-2.5 py-0.5 text-sm md:text-base rounded-lg',
@@ -25,6 +25,7 @@ const subtle = {
 	error: 'bg-error-primary bg-opacity-10 text-error-primary',
 	warning: 'bg-warning-primary bg-opacity-10 text-warning-primary',
 	primary: 'bg-text-primary bg-opacity-10 text-text-primary',
+	secondary: 'bg-text-primary bg-opacity-10 text-text-primary',
 	accent: 'bg-accent-primary bg-opacity-10 text-text-primary',
 };
 
@@ -34,6 +35,7 @@ const solid = {
 	error: 'bg-error-primary text-black dark:text-white',
 	warning: 'bg-warning-primary text-black dark:text-white',
 	primary: 'bg-primary text-black dark:text-white text-opacity-80',
+	secondary: 'bg-secondary text-black dark:text-white text-opacity-80',
 	accent: 'bg-accent-primary  text-black dark:text-white text-opacity-80',
 };
 
@@ -43,6 +45,7 @@ const outline = {
 	error: 'bg-transparent border border-error-primary text-error-primary',
 	warning: 'bg-transparent border border-warning-primary text-warning-primary',
 	primary: 'bg-transparent border border-text-primary text-text-primary',
+	secondary: 'bg-transparent border border-text-secondary text-text-primary',
 	accent: 'bg-transparent border border-accent-primary text-accent-primary',
 };
 

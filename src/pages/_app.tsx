@@ -1,25 +1,16 @@
 import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
 import { loggerLink } from '@trpc/client/links/loggerLink';
 import { withTRPC } from '@trpc/next';
-import { NextPage } from 'next';
+import { NextPage, NextPageContext } from 'next';
 import { getSession, SessionProvider } from 'next-auth/react';
 import { ThemeProvider } from 'next-themes';
-import { AppProps } from 'next/app';
-import { ReactElement, ReactNode } from 'react';
+import { AppContext, AppProps } from 'next/app';
 import type { AppRouter } from 'server/routers/_app';
 import superjson from 'superjson';
 
 import '../../public/global.css';
 
-export type NextPageWithLayout = NextPage & {
-	getLayout?: (page: ReactElement) => ReactNode;
-};
-
-type AppPropsWithLayout = AppProps & {
-	Component: NextPageWithLayout;
-};
-
-const MyApp = ({ Component, pageProps }: AppPropsWithLayout) => {
+const MyApp = ({ Component, pageProps }: AppProps) => {
 	return (
 		<SessionProvider session={pageProps.session}>
 			<ThemeProvider attribute="class">
@@ -29,7 +20,7 @@ const MyApp = ({ Component, pageProps }: AppPropsWithLayout) => {
 	);
 };
 
-MyApp.getInitialProps = async ({ ctx }) => {
+MyApp.getInitialProps = async ({ ctx }: AppContext) => {
 	return {
 		pageProps: {
 			session: await getSession(ctx),

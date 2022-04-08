@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { createElement } from 'react';
 
 type Props = {
-	type: '' | 'success' | 'error' | 'info';
+	type: 'success' | 'error' | 'info';
 	title: string;
 	description?: string;
 };

@@ -16,6 +16,7 @@ specifiers:
   '@types/node-fetch': ^2.5.11
   '@types/nprogress': ^0.2.0
   '@types/react': ^17.0.20
+  '@types/react-dom': ^18.0.0
   '@types/ws': ^8.2.0
   '@typescript-eslint/eslint-plugin': ^4.30.0
   '@typescript-eslint/parser': ^5.14.0
@@ -78,6 +79,7 @@ devDependencies:
   '@types/node-fetch': 2.6.1
   '@types/nprogress': 0.2.0
   '@types/react': 17.0.43
+  '@types/react-dom': 18.0.0
   '@types/ws': 8.5.3
   '@typescript-eslint/eslint-plugin': 4.33.0_07cfaf8d757993696777a907395c62b8
   '@typescript-eslint/parser': 5.18.0_eslint@7.32.0+typescript@4.4.4
@@ -505,6 +507,12 @@ packages:
 
   /@types/prop-types/15.7.4:
     resolution: {integrity: sha512-rZ5drC/jWjrArrS8BR6SIr4cWpW09RNTYt9AMZo3Jwwif+iacXAqgVjm0B0Bv/S1jhDXKHqRVNCbACkJ89RAnQ==}
+    dev: true
+
+  /@types/react-dom/18.0.0:
+    resolution: {integrity: sha512-49897Y0UiCGmxZqpC8Blrf6meL8QUla6eb+BBhn69dTXlmuOlzkfr7HHY/O8J25e1lTUMs+YYxSlVDAaGHCOLg==}
+    dependencies:
+      '@types/react': 17.0.43
     dev: true
 
   /@types/react/17.0.43:

@@ -226,12 +226,14 @@ export const variants = {
 };
 
 const leadingIconClasses = {
+	xxs: '-ml-0.5 mr-1 h-3.5 w-3',
 	xs: '-ml-0.5 mr-1 h-3.5 w-3.5',
 	sm: '-ml-0.5 mr-1.5 h-4 w-4',
 	md: '-ml-0.5 mr-1.5 h-4 w-4',
 	lg: '-ml-1 mr-1.5 h-5 w-5',
 };
 const trailingIconClasses = {
+	xxs: 'ml-1 -mr-0.5 h-3.5 w-3',
 	xs: 'ml-1 -mr-0.5 h-3.5 w-3.5',
 	sm: 'ml-1.5 -mr-0.5 h-4 w-4 ',
 	md: 'ml-1.5 -mr-0.5 h-4 w-4 order-2',

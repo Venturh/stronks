@@ -13,11 +13,11 @@ export default function MobilePortal({ id = 'mobile-side', children }: Props) {
 		setMounted(true);
 		return () => setMounted(false);
 	}, []);
-
+	const el = document.getElementById(id);
 	return mounted ? (
 		<>
 			<div className="hidden lg:block">{children}</div>
-			<div className="lg:hidden">{createPortal(children, document.getElementById(id))}</div>
+			{el && <div className="lg:hidden">{createPortal(children, el)}</div>}
 		</>
 	) : null;
 }

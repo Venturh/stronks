@@ -29,7 +29,10 @@ export function SkeletonText({ height = 16, color, count = 1 }: Props) {
 				<div
 					key={i}
 					style={{ height: `${height}px` }}
-					className={clsx('w-full rounded-lg animate-pulse bg-secondary', colors[color as string])}
+					className={clsx(
+						'w-full rounded-lg animate-pulse bg-secondary',
+						colors[color ?? 'accent']
+					)}
 				/>
 			))}
 		</div>
