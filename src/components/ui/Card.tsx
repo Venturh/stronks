@@ -29,7 +29,12 @@ export default function Card({ main, second, children, color, loading }: CardIte
 			) : main && second ? (
 				<>
 					<dd className="text-sm truncate text-secondary">{second}</dd>
-					<dt className={clsx('mt-1 font-semibold leading-6', colors.get(color) ?? 'text-primary')}>
+					<dt
+						className={clsx(
+							'mt-1 font-semibold leading-6',
+							colors.get(color as string) ?? 'text-primary'
+						)}
+					>
 						{main}
 					</dt>
 				</>

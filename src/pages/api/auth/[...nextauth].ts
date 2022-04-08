@@ -53,7 +53,7 @@ const createOptions = (req: NextApiRequest): NextAuthOptions => ({
 			if (session.user) {
 				//@ts-expect-error yep
 				session.user.id = user.id;
-				session.id = (await db.session.findUnique({ where: { sessionToken } })).id;
+				session.id = (await db.session.findUnique({ where: { sessionToken } }))?.id;
 			}
 			return session;
 		},
