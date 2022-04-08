@@ -10,14 +10,14 @@ import { authenticatedRoute } from 'utils/redirects';
 export default function Posts() {
 	const postsQuery = trpc.useQuery(['post.all']);
 
-	const utils = trpc.useContext();
+	// const utils = trpc.useContext();
 
 	// prefetch all posts for instant navigation
-	useEffect(() => {
-		for (const { id } of postsQuery.data ?? []) {
-			utils.prefetchQuery(['post.byId', { id }]);
-		}
-	}, [postsQuery.data, utils]);
+	// useEffect(() => {
+	// 	for (const { id } of postsQuery.data ?? []) {
+	// 		utils.prefetchQuery(['post.byId', { id }]);
+	// 	}
+	// }, [postsQuery.data, utils]);
 
 	return (
 		<AppLayout title="Posts">
