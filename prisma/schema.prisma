@@ -4,9 +4,9 @@ datasource db {
 }
 
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
+    previewFeatures = ["improvedQueryRaw"]
 }
-
 
 model Account {
     id                       String  @id @default(cuid())
@@ -39,21 +39,134 @@ model Session {
     user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model User {
-    id            String        @id @default(cuid())
-    name          String?
-    email         String?       @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
+enum Phase {
+    MAINTAIN
+    CUTTING
+    BULKING
 }
 
+model User {
+    id                    String             @id @default(cuid())
+    name                  String?
+    email                 String?            @unique
+    emailVerified         DateTime?
+    image                 String?
+    hiddenOverviewColumns String[]
+    phase                 Phase              @default(MAINTAIN)
+    accounts              Account[]
+    sessions              Session[]
+    measurements          Measurements[]
+    nutritions            Nutrition[]
+    activitySessions      ActivitySession[]
+    googleFitSettings     GoogleFitSetting[]
+    additonal             Info[]
+    Supplements           Supplements[]
+}
 
-model Post {
-  id     String       @id @default(uuid())
-  title   String
-  text   String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
+model GoogleFitSetting {
+    id            String   @id @default(uuid())
+    userId        String
+    syncWeight    Boolean  @default(false)
+    syncBodyFat   Boolean  @default(false)
+    syncSteps     Boolean  @default(false)
+    syncActivity  Boolean  @default(false)
+    syncSession   Boolean  @default(false)
+    syncNutrition Boolean  @default(false)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @default(now())
+    user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Measurements {
+    id                    String              @id @default(uuid())
+    objectId              String              @unique
+    measuredFormat        DateTime            @unique
+    weight                Float?
+    bodyFat               Float?
+    infoId                String
+    userId                String
+    info                  Info                @relation(fields: [infoId], references: [id])
+    aditionalMeasurements AdditionalMeasures?
+    user                  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AdditionalMeasures {
+    id           String       @id @default(uuid())
+    objectId     String       @unique
+    neck         Int?
+    shoulders    Int?
+    chest        Int?
+    leftBicep    Int?
+    rightBicep   Int?
+    leftForearm  Int?
+    rightForearm Int?
+    upperAbs     Int?
+    lowerAbs     Int?
+    waist        Int?
+    hips         Int?
+    letfThigh    Int?
+    rightThigh   Int?
+    leftCalf     Int?
+    rightCalf    Int?
+    measuresId   String       @unique
+    measures     Measurements @relation(fields: [measuresId], references: [id], onDelete: Cascade)
+}
+
+model Nutrition {
+    id                 String   @id @default(uuid())
+    objectId           String   @unique
+    name               String
+    amount             String?
+    calories           Float?
+    carbohydrates      Float?
+    fat                Float?
+    protein            Float?
+    originDataSourceId String?
+    category           String?
+    measuredFormat     DateTime
+    measuredAt         DateTime
+    infoId             String?
+    Info               Info?    @relation(fields: [infoId], references: [id])
+    userId             String
+    user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Supplements {
+    id             String   @id @default(uuid())
+    measuredFormat DateTime @unique
+    creatine       Boolean? @default(false)
+    multiVitamin   Boolean? @default(false)
+    infoId         String?  @unique
+    userId         String
+    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    Info           Info?    @relation(fields: [infoId], references: [id])
+}
+
+model ActivitySession {
+    id             String   @id @default(uuid())
+    objectId       String   @unique
+    name           String
+    duration       Float
+    steps          Float?
+    measuredAt     DateTime
+    measuredFormat DateTime
+    appName        String
+    activityType   Int
+    userId         String
+    infoId         String?
+    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    info           Info?    @relation(fields: [infoId], references: [id])
+}
+
+model Info {
+    id               String            @id @default(uuid())
+    measuredFormat   DateTime          @unique
+    phase            Phase?            @default(MAINTAIN)
+    notes            String?
+    userId           String
+    measurements     Measurements[]
+    nutritions       Nutrition[]
+    activitySessions ActivitySession[]
+    supplement       Supplements?
+    user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

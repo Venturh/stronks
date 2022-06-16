@@ -1,32 +1,77 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import NextAuth, { NextAuthOptions, User as NextAuthUser } from 'next-auth';
-import GithubProvider from 'next-auth/providers/github';
-import DiscordProvider from 'next-auth/providers/discord';
+import GoogleProvider from 'next-auth/providers/google';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 
 import { db } from 'lib/prisma';
+import { Account, User } from '@prisma/client';
+import dayjs from 'dayjs';
 
 export interface NextAuthUserWithStringId extends NextAuthUser {
 	id: string;
 }
 
+async function refreshAccessToken(account: Account) {
+	console.log('REFRESH ACCESS TOKEN');
+	try {
+		const url =
+			'https://oauth2.googleapis.com/token?' +
+			new URLSearchParams({
+				clientId: process.env.GOOGLE_CLIENT_ID ?? '',
+				clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
+				grant_type: 'refresh_token',
+				refresh_token: account.refresh_token ?? '',
+			});
+
+		const response = await fetch(url, {
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+			},
+			method: 'POST',
+		});
+
+		const data = await response.json();
+
+		if (!!data.error) {
+			throw new Error(data.error_description);
+		}
+
+		const expires_at = dayjs((Date.now() / 1000 + data.expires_in) * 1000).unix();
+
+		await db.account.update({
+			where: {
+				id: account.id,
+			},
+			data: {
+				access_token: data.access_token,
+				refresh_token: data.refresh_token ?? account.refresh_token,
+				refresh_token_expires_in: data.refresh_token_expires_in,
+				expires_at,
+				token_type: data.token_type,
+				scope: data.scope,
+			},
+		});
+
+		return { expires_at };
+	} catch (error) {
+		return { expires_at: account.expires_at };
+	}
+}
+
 const createOptions = (req: NextApiRequest): NextAuthOptions => ({
 	providers: [
-		GithubProvider({
-			clientId: process.env.GITHUB_ID,
-			clientSecret: process.env.GITHUB_SECRET,
-			profile(profile: any) {
-				return {
-					id: profile.id.toString(),
-					name: profile.name || profile.login,
-					email: profile.email,
-					image: profile.avatar_url,
-				} as NextAuthUserWithStringId;
+		GoogleProvider({
+			clientId: process.env.GOOGLE_CLIENT_ID ?? '',
+			clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
+			authorization: {
+				params: {
+					prompt: 'consent',
+					access_type: 'offline',
+					response_type: 'code',
+					scope:
+						'openid email profile https://www.googleapis.com/auth/fitness.activity.read https://www.googleapis.com/auth/fitness.location.read https://www.googleapis.com/auth/fitness.body.read https://www.googleapis.com/auth/fitness.nutrition.read https://www.googleapis.com/auth/fitness.reproductive_health.read',
+				},
 			},
-		}),
-		DiscordProvider({
-			clientId: process.env.DISCORD_CLIENT_ID,
-			clientSecret: process.env.DISCORD_CLIENT_SECRET,
 		}),
 	],
 	secret: process.env.COOKIE_SECRET,
@@ -51,9 +96,27 @@ const createOptions = (req: NextApiRequest): NextAuthOptions => ({
 				});
 			}
 			if (session.user) {
+				session.user = user as User;
 				//@ts-expect-error yep
-				session.user.id = user.id;
 				session.id = (await db.session.findUnique({ where: { sessionToken } }))?.id;
+			}
+
+			//TODO somehow get expires_at from refresh token
+			const account = await db.account.findFirst({
+				where: {
+					userId: user.id,
+					provider: 'google',
+				},
+			});
+
+			if (account) {
+				const accessTokenExpires = account.expires_at ?? 0;
+				// convert to milliseconds for check
+				if (Date.now() > accessTokenExpires * 1000) {
+					// return session;
+					const { expires_at } = await refreshAccessToken(account);
+					session.expires_at = expires_at!;
+				}
 			}
 			return session;
 		},
@@ -61,11 +124,15 @@ const createOptions = (req: NextApiRequest): NextAuthOptions => ({
 
 	events: {
 		createUser: async ({ user }) => {
+			await db.googleFitSetting.create({
+				data: { syncActivity: false, syncSteps: false, syncWeight: false, userId: user.id },
+			});
 			if (user.image === null) {
 				await db.user.update({
 					where: { id: user.id },
 					data: {
 						image: `https://api.multiavatar.com/${user.name ?? user.email}.png`,
+						hiddenOverviewColumns: [],
 					},
 				});
 			}

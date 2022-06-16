@@ -54,6 +54,7 @@ export default withTRPC<AppRouter>({
 		 */
 
 		return {
+			url: `${getBaseUrl()}/api/trpc`,
 			/**
 			 * @link https://trpc.io/docs/links
 			 */

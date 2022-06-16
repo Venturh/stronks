@@ -14,6 +14,8 @@ export type MenuItem = {
 	active?: boolean;
 	disabled?: boolean;
 	icon?: React.ReactElement;
+	shortcut?: string;
+	nested?: MenuItem[];
 	action?: (item: string | boolean | number | MenuItem) => void;
 	indexAction?: (i: number) => void;
 	desktopHidden?: boolean;
@@ -24,29 +26,27 @@ export interface MenuProps extends Omit<ModalProps, 'open' | 'setOpen'> {
 	menuItems?: MenuItem[];
 	children?: React.ReactElement;
 	additionalItem?: React.ReactNode;
-	mobileModal?: boolean;
-	position?: 'bottom-right' | 'bottom-left';
-	disabled?: boolean;
+	origin?: 'bottom' | 'top';
 	modal?: boolean;
 }
 
 const Menu = forwardRef<any, MenuProps>(
-	(
-		{
-			children,
-			menuItems,
-			additionalItem,
-			position = 'bottom-right',
-			mobileModal = false,
-			modal = false,
-			disabled = false,
-			...rest
-		}: MenuProps,
-		_
-	) => {
+	({
+		children,
+		menuItems,
+		additionalItem,
+		origin = 'bottom',
+		modal = false,
+		...rest
+	}: MenuProps) => {
 		const node = useRef<HTMLDivElement>(null);
 		const [open, setOpen] = useState(false);
 		const isMobile = useIsMobile();
+
+		const origins = {
+			bottom: 'top-12 right-0',
+			top: '-top-36 right-0',
+		};
 
 		if (!modal && !isMobile) {
 			return (
@@ -66,7 +66,10 @@ const Menu = forwardRef<any, MenuProps>(
 					>
 						<DropdownMenu.Items
 							static
-							className="absolute right-0 z-10 w-56 mt-4 text-sm origin-top-right border rounded-md shadow-lg max-h-96 focus:outline-none ring-1 ring-opacity-5 border-accent-primary bg-secondary ring-accent-primary"
+							className={clsx(
+								'absolute right-0 z-10 min-w-[14em] w-full text-sm origin-top border rounded-md shadow-lg max-h-96 focus:outline-none ring-1 ring-opacity-5 border-accent-primary bg-secondary ring-accent-primary',
+								origins[origin]
+							)}
 						>
 							<MenuItems additionalItem={additionalItem} menuItems={menuItems!} />
 						</DropdownMenu.Items>

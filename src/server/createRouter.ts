@@ -1,9 +1,6 @@
-import { Context } from './context';
 import { router } from '@trpc/server';
+import { Context } from 'server/context';
 
-/**
- * Helper function to create a router with context
- */
 export function createRouter() {
 	return router<Context>();
 }

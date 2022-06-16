@@ -3,19 +3,44 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import clsx from 'clsx';
 import { Disclosure } from '@headlessui/react';
-import { MenuIcon, XIcon } from '@heroicons/react/outline';
+import { HomeIcon, MenuIcon, XIcon } from '@heroicons/react/outline';
 
 import UserDropdown from './UserDropown';
 import Button from 'components/ui/Button';
 import Logo from 'components/ui/Logo';
+export type NavLink = {
+	name: string;
+	description: string;
+	href: string;
+	icon: React.ReactNode;
+	protected: boolean;
+};
 
-import { filteredNavLinks, getNavLinks } from 'utils/navigation';
+const navLinks = [
+	{
+		name: 'Home',
+		description: 'Home',
+		href: '/home',
+		icon: HomeIcon,
+		protected: true,
+	},
+];
 
-export default function DefaultNavigation() {
+export function filteredNavLinks(navlinks: NavLink[], loggedIn: boolean) {
+	return navlinks.filter((link) => {
+		if (link.protected === undefined || link.protected === false) return link;
+		if (!loggedIn) {
+			if (link.protected) return false;
+		} else {
+			if (!link.protected) return link;
+		}
+		return link;
+	});
+}
+
+export default function LandingNavigation() {
 	const { pathname } = useRouter();
 	const { data } = useSession();
-
-	const navlinks = getNavLinks();
 
 	return (
 		<Disclosure as="nav" className="bg-secondary">
@@ -40,7 +65,7 @@ export default function DefaultNavigation() {
 								</div>
 								<div className="hidden sm:block sm:ml-6">
 									<div className="flex space-x-4">
-										{filteredNavLinks(navlinks, Boolean(data?.user)).map((link) => {
+										{filteredNavLinks(navLinks, Boolean(data?.user)).map((link) => {
 											return (
 												<Link href={link.href} key={link.name}>
 													<a
@@ -65,7 +90,7 @@ export default function DefaultNavigation() {
 							</div>
 							<div className="flex items-center pr-2 sm:static sm:inset-auto sm:pr-0 sm:ml-6">
 								{data?.user ? (
-									<UserDropdown />
+									<UserDropdown imageOnly />
 								) : (
 									<Button size="sm" variant="solid" href="/auth/login">
 										Login
@@ -77,14 +102,14 @@ export default function DefaultNavigation() {
 
 					<Disclosure.Panel className="sm:hidden bg-secondary">
 						<div className="px-2 pt-2 pb-3 space-y-1">
-							{navlinks.map((item) => {
-								const current = pathname.startsWith(item.href);
+							{filteredNavLinks(navLinks, Boolean(data?.user)).map((link) => {
+								const current = pathname.startsWith(link.href);
 
 								return (
 									<Disclosure.Button
-										key={item.name}
+										key={link.name}
 										as="a"
-										href={item.href}
+										href={link.href}
 										className={clsx(
 											current
 												? 'text-white bg-gray-900'
@@ -92,7 +117,7 @@ export default function DefaultNavigation() {
 											'block py-2 px-3 text-base font-medium rounded-md'
 										)}
 									>
-										{item.name}
+										{link.name}
 									</Disclosure.Button>
 								);
 							})}
