@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { EyeOffIcon } from '@heroicons/react/outline';
 import {
+	ColumnOrderState,
 	createTable,
 	getCoreRowModel,
 	useTableInstance,
 	VisibilityState,
 } from '@tanstack/react-table';
 import { Phase } from '@prisma/client';
-import { ReactSortable, Sortable } from 'react-sortablejs';
+import { ItemInterface, ReactSortable } from 'react-sortablejs';
 
 import Select from './ui/Select';
 import Checkbox from './ui/Checkbox';
@@ -24,6 +25,7 @@ import clsx from 'clsx';
 type Props = {
 	items: OverviewData[];
 	hiddenTableHeaders: string[];
+	orderOverviewColumns: string[];
 };
 const table = createTable().setRowType<OverviewData>();
 
@@ -60,9 +62,8 @@ const defaultColumns = [
 	}),
 ];
 
-export default function OverviewTable({ items, hiddenTableHeaders }: Props) {
-	const columnKeys = defaultColumns.map((c) => c.id);
-	const initialVisibility = columnKeys.reduce<Record<string, any>>((acc, curr) => {
+export default function OverviewTable({ items, hiddenTableHeaders, orderOverviewColumns }: Props) {
+	const initialVisibility = orderOverviewColumns.reduce<Record<string, any>>((acc, curr) => {
 		acc[curr] = hiddenTableHeaders.includes(curr) ? false : true;
 		return acc;
 	}, {});
@@ -70,19 +71,21 @@ export default function OverviewTable({ items, hiddenTableHeaders }: Props) {
 	const [data] = React.useState(() => [...items]);
 	const [columns] = React.useState<typeof defaultColumns>(() => [...defaultColumns]);
 	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(initialVisibility);
+	const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(orderOverviewColumns);
 	const [columnVisibilityList, setColumnVisibilityList] = useState<ItemInterface[]>(
 		Object.entries(columnVisibility).map(([id, visible]) => ({ id, visible }))
 	);
 
 	const [open, setOpen] = useState(false);
 
-	const editHiddenColumns = trpc.useMutation('user.edit');
+	const editUser = trpc.useMutation('user.edit');
 
 	const instance = useTableInstance(table, {
 		data,
 		columns,
 		state: {
 			columnVisibility,
+			columnOrder,
 		},
 		onColumnVisibilityChange: setColumnVisibility,
 		getCoreRowModel: getCoreRowModel(),
@@ -94,16 +97,25 @@ export default function OverviewTable({ items, hiddenTableHeaders }: Props) {
 			[id]: show,
 		};
 		const hiddenOverviewColumns = Object.keys(visibility).filter((key) => !visibility[key]);
-
-		await editHiddenColumns.mutateAsync({
+		await editUser.mutateAsync({
 			data: {
 				hiddenOverviewColumns,
 			},
 		});
-
 		setColumnVisibilityList(
 			columnVisibilityList.map((item) => ({ ...item, visible: visibility[item.id] }))
 		);
+	}
+
+	async function editColumnOrder(list: ItemInterface[]) {
+		const idOrder = list.map((item) => item.id as string);
+		setColumnOrder(idOrder);
+		setColumnVisibilityList(list);
+		await editUser.mutateAsync({
+			data: {
+				orderOverviewColumns: idOrder,
+			},
+		});
 	}
 
 	return (
@@ -174,9 +186,14 @@ export default function OverviewTable({ items, hiddenTableHeaders }: Props) {
 					delay={1}
 					swap
 					list={columnVisibilityList}
-					setList={(list) => {
-						setColumnVisibilityList(list);
-						instance.setColumnOrder(list.map((item) => item.id as string));
+					setList={async (list, sortable, store) => {
+						if (
+							store.dragging &&
+							store.dragging.props &&
+							JSON.stringify(store.dragging.props.list) !== JSON.stringify(list)
+						) {
+							await editColumnOrder(list);
+						}
 					}}
 				>
 					{columnVisibilityList.map(({ id, visible }) => (

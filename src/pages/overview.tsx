@@ -9,7 +9,11 @@ export default function Home() {
 	return (
 		<AppLayout title="Overview">
 			{data && (
-				<OverviewTable items={data.items} hiddenTableHeaders={data.hiddenOverviewColumns ?? []} />
+				<OverviewTable
+					items={data.items}
+					orderOverviewColumns={data.orderOverviewColumns}
+					hiddenTableHeaders={data.hiddenOverviewColumns}
+				/>
 			)}
 		</AppLayout>
 	);

@@ -29,6 +29,7 @@ export const userRouter = createRouter()
 				email: z.string().email().optional(),
 				phase: z.nativeEnum(Phase).optional(),
 				hiddenOverviewColumns: z.array(z.string()).optional(),
+				orderOverviewColumns: z.array(z.string()).optional(),
 			}),
 		}),
 		async resolve({ input, ctx: { user } }) {

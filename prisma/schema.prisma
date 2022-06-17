@@ -52,6 +52,7 @@ model User {
     emailVerified         DateTime?
     image                 String?
     hiddenOverviewColumns String[]
+    orderOverviewColumns  String[]
     phase                 Phase              @default(MAINTAIN)
     accounts              Account[]
     sessions              Session[]
