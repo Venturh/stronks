@@ -144,19 +144,20 @@ model Supplements {
 }
 
 model ActivitySession {
-    id             String   @id @default(uuid())
-    objectId       String   @unique
-    name           String
-    duration       Float
-    steps          Float?
-    measuredAt     DateTime
-    measuredFormat DateTime
-    appName        String
-    activityType   Int
-    userId         String
-    infoId         String?
-    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    info           Info?    @relation(fields: [infoId], references: [id])
+    id               String   @id @default(uuid())
+    objectId         String   @unique
+    name             String
+    duration         Float
+    calories         Float?
+    measuredAt       DateTime
+    measuredFormat   DateTime
+    appName          String
+    activityType     Int
+    activityTypeName String
+    userId           String
+    infoId           String?
+    user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    info             Info?    @relation(fields: [infoId], references: [id])
 }
 
 model Info {

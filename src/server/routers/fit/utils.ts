@@ -3,7 +3,12 @@ import dayjs from 'dayjs';
 import uuidByString from 'uuid-by-string';
 
 import { db } from 'lib/prisma';
-import { AggregatedDataSourceResponse, DataSourceResponse, FitSession } from './types';
+import {
+	activityTypeMapping,
+	AggregatedDataSourceResponse,
+	DataSourceResponse,
+	FitSession,
+} from './types';
 import { toStartOfDay } from 'utils/date';
 
 export async function getSessionData(accessToken: string) {
@@ -24,18 +29,22 @@ export async function getDatasetData(accessToken: string, dataSourceId: string) 
 	);
 	return data;
 }
-export async function getAggregatedData(accessToken: string, dataSourceId: string) {
+export async function getAggregatedData(
+	accessToken: string,
+	dataTypeNames: string[],
+	aggregation: 'bucketBySession' | 'bucketByActivitySegment' | 'bucketByTime' = 'bucketByTime'
+) {
 	const startTime = dayjs().subtract(2, 'months').unix() * 1000;
 	const endTime = dayjs().subtract(0, 'days').unix() * 1000;
 	const { data }: AxiosResponse<AggregatedDataSourceResponse> = await axios.post(
 		'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',
 		{
 			aggregateBy: [
-				{
-					dataSourceId,
-				},
+				dataTypeNames.map((dataTypeName) => ({
+					dataTypeName,
+				})),
 			],
-			bucketByTime: {
+			[aggregation]: {
 				durationMillis: 86400000,
 			},
 			endTimeMillis: endTime,
@@ -130,37 +139,39 @@ export async function persistNutritionFitData(
 	);
 }
 
-export async function persistActivitySessionData(
-	dataSourceId: string,
-	accessToken: string,
-	userId: string
-) {
-	const { session } = await getSessionData(accessToken);
-
-	return await Promise.all(
-		session.map(async (session) => {
-			const measuredAt = dayjs.unix(session.startTimeMillis / 1000);
-			const measuredFormat = toStartOfDay(measuredAt);
-			const endTime = dayjs.unix(session.endTimeMillis / 1000);
-
-			const data = {
-				objectId: session.id,
-				name: session.name,
-				duration: endTime.diff(measuredAt, 'minute'),
-				appName: session.application.packageName,
-				activityType: session.activityType,
-				measuredAt: measuredAt.toDate(),
-				infoId: await createOrUpateInfo(measuredFormat, userId),
-				measuredFormat,
-				userId,
-			};
-			return await db.activitySession.upsert({
-				where: { objectId: session.id },
-				update: data,
-				create: data,
-			});
-		})
+export async function persistActivitySessionData(accessToken: string, userId: string) {
+	const { bucket } = await getAggregatedData(
+		accessToken,
+		['com.google.calories.expended', 'com.google.active_minutes'],
+		'bucketBySession'
 	);
+	for await (const buck of bucket) {
+		const { dataset, session, startTimeMillis } = buck;
+		const { activityType, application, name, id } = session!;
+		const caloriesDataSet = dataset[0]!.point[0]!;
+		const durationDataSet = dataset[1].point[0];
+		const measuredAt = dayjs.unix(startTimeMillis / 1000).toDate();
+		const measuredFormat = toStartOfDay(measuredAt);
+		const data = {
+			name,
+			activityType,
+			measuredAt,
+			measuredFormat,
+			userId,
+			objectId: id,
+			infoId: await createOrUpateInfo(measuredFormat, userId),
+			activityTypeName: activityTypeMapping.get(activityType)!,
+			appName: application.packageName,
+			duration: durationDataSet.value[0].intVal!,
+			calories: caloriesDataSet.value[0].fpVal! as number,
+		};
+
+		await db.activitySession.upsert({
+			where: { objectId: id },
+			update: data,
+			create: data,
+		});
+	}
 }
 
 async function createOrUpateInfo(measuredFormat: Date, userId: string) {

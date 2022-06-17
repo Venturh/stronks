@@ -30,7 +30,7 @@ export default function AppLayout({ children, title }: Props) {
 							</button>
 						</div>
 
-						<div className="overflow-scroll ">{children}</div>
+						<div className="px-2 py-3 overflow-scroll">{children}</div>
 					</div>
 				</div>
 			</div>

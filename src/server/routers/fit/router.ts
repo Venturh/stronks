@@ -71,7 +71,7 @@ export const fitRouter = createRouter().mutation('retrieveFitnessData', {
 							await persistNutritionFitData(dataSourceId, accessToken, user.id);
 							break;
 						case FitType.syncSession:
-							await persistActivitySessionData(dataSourceId, accessToken, user.id);
+							await persistActivitySessionData(accessToken, user.id);
 							break;
 					}
 				})

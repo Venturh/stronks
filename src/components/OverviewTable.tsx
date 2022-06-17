@@ -119,9 +119,8 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 	}
 
 	return (
-		<div className="p-2">
-			<div className="h-4" />
-			<div className="relative shadow bg-secondary ring-1 ring-accent-primary md:rounded-lg">
+		<div>
+			<div className="relative shadow ring-1 ring-accent-primary md:rounded-lg">
 				<table className="min-w-full overflow-x-scroll divide-y table-fixed divide-accent-primary">
 					<thead>
 						{instance.getHeaderGroups().map((headerGroup) => (
@@ -182,6 +181,7 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 			</div>
 			<SlideOver title="Settings" open={open} onClose={() => setOpen(false)}>
 				<ReactSortable
+					className="divide-y divide-accent-primary"
 					animation={200}
 					delay={1}
 					swap
@@ -197,7 +197,7 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 					}}
 				>
 					{columnVisibilityList.map(({ id, visible }) => (
-						<div className="w-full px-2 py-1.5 bg-secondary " key={id}>
+						<div className="w-full px-2 py-1.5" key={id}>
 							<div className="flex justify-between">
 								<div className="flex items-center ">
 									<MenuIcon className="w-4 h-4 text-secondary" />
