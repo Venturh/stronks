@@ -31,13 +31,14 @@ export default function SlideOver({ children, open, onClose, title }: Props) {
 							>
 								<Dialog.Panel className="w-screen max-w-md pointer-events-auto">
 									<div className="flex flex-col h-full py-6 overflow-y-scroll border-l shadow-xl bg-secondary border-l-accent-primary">
-										<div className="px-4 sm:px-6">
+										<div className="px-4">
 											<div className="flex items-start justify-between">
 												<Dialog.Title className="text-lg font-medium text-primary">
 													{title}
 												</Dialog.Title>
 												<div className="flex items-center ml-3 h-7">
 													<IconButton
+														size="sm"
 														onClick={onClose}
 														icon={<XIcon />}
 														ariaLabel="close"
@@ -48,7 +49,7 @@ export default function SlideOver({ children, open, onClose, title }: Props) {
 												</div>
 											</div>
 										</div>
-										<div ref={initalFocusRef} className="relative flex-1 px-4 mt-6 sm:px-6">
+										<div ref={initalFocusRef} className="relative flex-1 mt-6">
 											{children}
 										</div>
 									</div>

@@ -166,7 +166,7 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 							</tr>
 						))}
 					</thead>
-					<tbody className="relative divide-y divide-accent-secondary">
+					<tbody className="relative divide-y divide-accent-primary">
 						{instance.getRowModel().rows.map((row) => (
 							<tr key={row.id}>
 								{row.getVisibleCells().map((cell) => (
@@ -197,24 +197,26 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 					}}
 				>
 					{columnVisibilityList.map(({ id, visible }) => (
-						<div className="w-full px-2 py-1.5" key={id}>
-							<div className="flex justify-between">
-								<div className="flex items-center ">
-									<MenuIcon className="w-4 h-4 text-secondary" />
-									<span className="ml-1 capitalize">{id}</span>
+						<div key={id} className="cursor-default bg-secondary hover:bg-accent-secondary">
+							<div className="w-full px-4 py-2 ">
+								<div className="flex justify-between">
+									<div className="flex items-center ">
+										<MenuIcon className="w-3.5 h-3.5 text-secondary" />
+										<span className="ml-1 text-sm capitalize">{id}</span>
+									</div>
+									<IconButton
+										onClick={async () => {
+											await editColumVisibility(id as string, !visible);
+											instance.getColumn(id as string).toggleVisibility(!visible);
+										}}
+										className={clsx({ 'opacity-50': !visible })}
+										size="xs"
+										variant="ghost"
+										color="primary"
+										icon={<EyeIcon />}
+										ariaLabel="show"
+									/>
 								</div>
-								<IconButton
-									onClick={async () => {
-										await editColumVisibility(id as string, !visible);
-										instance.getColumn(id as string).toggleVisibility(!visible);
-									}}
-									className={clsx({ 'opacity-50': !visible })}
-									size="xs"
-									variant="ghost"
-									color="primary"
-									icon={<EyeIcon />}
-									ariaLabel="show"
-								/>
 							</div>
 						</div>
 					))}

@@ -22,18 +22,16 @@ export default function NestedMenu({ menuItems, children, ...rest }: Props) {
 		<div className="relative inline-block w-full text-left">
 			<DropdownMenuPrimitive.Root>
 				<DropdownMenuPrimitive.Trigger asChild>
-					<button className={clsx('w-full', rest.className)} type="button">
-						{children}
-					</button>
+					<div className={clsx('w-full', rest.className)}>{children}</div>
 				</DropdownMenuPrimitive.Trigger>
 
 				<DropdownMenuPrimitive.Content
 					align="end"
-					sideOffset={5}
+					sideOffset={0}
 					className={clsx(
 						' radix-side-top:animate-slide-up radix-side-bottom:animate-slide-down',
 						'min-w-[14em] rounded-lg px-1.5 py-1 shadow-md w-full',
-						'bg-accent-primary'
+						'bg-secondary'
 					)}
 				>
 					{menuItems.map(({ label, items }, i) => (
@@ -56,7 +54,7 @@ export default function NestedMenu({ menuItems, children, ...rest }: Props) {
 											<Clickable
 												disabled={item.disabled}
 												className={clsx(
-													'flex items-center space-x-4 w-full font-normal outline-none  disabled:cursor-not-allowed hover:bg-accent-secondary focus:bg-accent-secondary'
+													'flex items-center space-x-4 w-full font-normal outline-none  disabled:cursor-not-allowed '
 												)}
 												href={item?.to}
 												onClick={() => {
@@ -99,7 +97,7 @@ export default function NestedMenu({ menuItems, children, ...rest }: Props) {
 														<Clickable
 															disabled={item.disabled}
 															className={clsx(
-																'flex  items-center space-x-4 w-full font-normal outline-none  disabled:cursor-not-allowed hover:bg-accent-secondary focus:bg-accent-secondary'
+																'flex  items-center space-x-4 w-full font-normal outline-none  disabled:cursor-not-allowed'
 															)}
 															href={item?.to}
 															onClick={() => {

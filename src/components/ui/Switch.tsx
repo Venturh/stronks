@@ -13,7 +13,7 @@ export default function Switch({ checked, onChange, label, description }: Props)
 		<HSwitch.Group
 			as="div"
 			className={clsx({
-				'items-center  sm:grid sm:grid-cols-3 sm:gap-4  w-full': label,
+				'flex items-center justify-between': label,
 			})}
 		>
 			<span className="flex flex-col flex-grow col-span-2">
@@ -33,9 +33,9 @@ export default function Switch({ checked, onChange, label, description }: Props)
 					checked={checked}
 					onChange={onChange}
 					className={clsx(
-						checked ? 'bg-brand-primary' : 'bg-gray-200',
+						checked ? 'bg-brand-primary' : 'bg-accent-primary',
 						{ 'sm:ml-auto': label },
-						'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 '
+						'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-bg-primary focus:ring-brand-primary '
 					)}
 				>
 					<span className="sr-only">Use setting</span>

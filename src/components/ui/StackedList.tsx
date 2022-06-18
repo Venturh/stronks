@@ -51,7 +51,7 @@ type StackedListItemProps = ComponentProps<'li'> & {
 
 export function StackedListItem({ primary, secondary, tertiary, ...rest }: StackedListItemProps) {
 	return (
-		<li className="p-2 text-primary hover:bg-accent-primary/25" {...rest}>
+		<li className="p-2 text-primary hover:bg-accent-secondary" {...rest}>
 			<span className="text-sm ">{secondary}</span>
 			<div className="flex justify-between">
 				<div className="mt-1">{primary}</div>

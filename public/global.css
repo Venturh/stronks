@@ -9,10 +9,10 @@ body {
 .dark {
 	--text-primary: 255, 255, 255;
 	--text-secondary: 229, 231, 235;
-	--bg-primary: 24, 24, 27;
-	--bg-secondary: 30, 30, 33;
-	--accent-primary: 41, 41, 44;
-	--accent-secondary: 37, 37, 40;
+	--bg-primary: 33,33,36;
+	--bg-secondary: 36, 36, 38;
+	--accent-primary: 48, 48, 51;
+	--accent-secondary: 44, 44, 47;
 	--brand-primary: 165, 180, 252;
 	--brand-secondary: 129, 140, 248;
 	--success-primary: 110, 231, 183;
@@ -24,12 +24,12 @@ body {
 }
 
 .light {
-	--text-primary: 17, 24, 39;
-	--text-secondary: 75, 85, 99;
-	--bg-primary: 249, 250, 251;
+	--text-primary: 40, 42, 48;
+	--text-secondary: 107, 111, 118;
+	--bg-primary: 255, 255, 255;
 	--bg-secondary: 255, 255, 255;
-	--accent-primary: 243, 244, 246;
-	--accent-secondary: 238, 239, 241;
+	--accent-primary: 239, 239, 239;
+	--accent-secondary: 250,250,250;
 	--brand-primary:99, 102, 241;
 	--brand-secondary:79, 70, 229;
 	--success-primary: 16, 185, 129;

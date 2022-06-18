@@ -12,8 +12,8 @@ interface IconButtonsProps extends Omit<ButtonProps, OmittedProps> {
 }
 
 export const iconSizes = {
-	xxs: 'h-4 w-4',
-	xs: 'h-4 w-4',
+	xxs: 'h-3 w-3',
+	xs: 'h-3.5 w-3.5',
 	sm: 'h-4 w-4',
 	md: 'h-5 w-5',
 	lg: 'h-6 w-6',
