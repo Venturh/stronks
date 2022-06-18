@@ -10,6 +10,8 @@ import {
 	FitSession,
 } from './types';
 import { toStartOfDay } from 'utils/date';
+import { group } from 'console';
+import { groupBy } from 'lodash';
 
 export async function getSessionData(accessToken: string) {
 	const startTime = dayjs().subtract(2, 'months').toISOString();
@@ -40,9 +42,17 @@ export async function getAggregatedData(
 		'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',
 		{
 			aggregateBy: [
-				dataTypeNames.map((dataTypeName) => ({
-					dataTypeName,
-				})),
+				dataTypeNames.map((dataTypeName) => {
+					if (dataTypeName === 'com.google.step_count.delta')
+						return {
+							dataTypeName,
+							dataSourceId:
+								'derived:com.google.step_count.delta:com.google.android.gms:estimated_steps',
+						};
+					return {
+						dataTypeName,
+					};
+				}),
 			],
 			[aggregation]: {
 				durationMillis: 86400000,
@@ -145,33 +155,80 @@ export async function persistActivitySessionData(accessToken: string, userId: st
 		['com.google.calories.expended', 'com.google.active_minutes'],
 		'bucketBySession'
 	);
-	for await (const buck of bucket) {
-		const { dataset, session, startTimeMillis } = buck;
-		const { activityType, application, name, id } = session!;
-		const caloriesDataSet = dataset[0]!.point[0]!;
-		const durationDataSet = dataset[1].point[0];
-		const measuredAt = dayjs.unix(startTimeMillis / 1000).toDate();
-		const measuredFormat = toStartOfDay(measuredAt);
-		const data = {
-			name,
-			activityType,
-			measuredAt,
-			measuredFormat,
-			userId,
-			objectId: id,
-			infoId: await createOrUpateInfo(measuredFormat, userId),
-			activityTypeName: activityTypeMapping.get(activityType)!,
-			appName: application.packageName,
-			duration: durationDataSet.value[0].intVal!,
-			calories: caloriesDataSet.value[0].fpVal! as number,
-		};
+	const data = await Promise.all(
+		bucket.map(async (buck) => {
+			const { dataset, session, startTimeMillis } = buck;
+			const { activityType, application, name, id } = session!;
+			const caloriesDataSet = dataset[0]!.point[0]!;
+			const durationDataSet = dataset[1].point[0];
+			const measuredAt = dayjs.unix(startTimeMillis / 1000).toDate();
+			const measuredFormat = toStartOfDay(measuredAt);
+			const data = {
+				name,
+				activityType,
+				measuredAt,
+				measuredFormat,
+				userId,
+				objectId: id,
+				infoId: await createOrUpateInfo(measuredFormat, userId),
+				activityTypeName: activityTypeMapping.get(activityType)!,
+				appName: application.packageName,
+				duration: durationDataSet.value[0].intVal!,
+				calories: caloriesDataSet.value[0].fpVal! as number,
+			};
 
-		await db.activitySession.upsert({
-			where: { objectId: id },
-			update: data,
-			create: data,
-		});
-	}
+			return data;
+		})
+	);
+	await db.activitySession.createMany({ skipDuplicates: true, data });
+}
+
+export async function persistActivityStepsData(accessToken: string, userId: string) {
+	const { bucket } = await getAggregatedData(
+		accessToken,
+		[
+			'com.google.step_count.delta',
+			'com.google.distance.delta',
+			'com.google.calories.expended',
+			'com.google.active_minutes',
+			'com.google.speed',
+		],
+		'bucketByTime'
+	);
+
+	const data = await Promise.all(
+		bucket.map(async (buck) => {
+			const { dataset, startTimeMillis } = buck;
+
+			const steps = dataset[0]?.point[0]?.value[0]?.intVal ?? 0;
+			const distance = dataset[1]?.point[0]?.value[0]?.fpVal;
+			const calories = dataset[2]?.point[0]?.value[0]?.fpVal;
+			const duration = dataset[3]?.point[0]?.value[0]?.intVal;
+			const speed = dataset[4]?.point[0]?.value[1]?.fpVal;
+
+			const measuredAt = dayjs.unix(startTimeMillis / 1000).toDate();
+			const measuredFormat = toStartOfDay(measuredAt);
+			const objectId = makeApiUuid([measuredAt.toString()]);
+
+			const data = {
+				measuredFormat,
+				userId,
+				steps,
+				distance,
+				calories,
+				duration,
+				speed,
+				objectId,
+				infoId: await createOrUpateInfo(measuredFormat, userId),
+			};
+			return data;
+		})
+	);
+
+	await db.activitySteps.createMany({
+		skipDuplicates: true,
+		data: data,
+	});
 }
 
 async function createOrUpateInfo(measuredFormat: Date, userId: string) {

@@ -6,8 +6,7 @@ import {
 	HomeIcon,
 	LightBulbIcon,
 	CollectionIcon,
-	MenuAlt2Icon,
-} from '@heroicons/react/solid';
+} from '@heroicons/react/outline';
 import clsx from 'clsx';
 
 import Link from 'next/link';
@@ -31,7 +30,7 @@ export default function Sidebar() {
 		return pathname.startsWith(`/${href.split('/')[1]}`);
 	}
 	return (
-		<nav className="z-10 flex flex-col flex-grow w-48 pt-5 pb-4 border-r-2 bg-primary border-accent-primary ">
+		<nav className="z-10 flex flex-col flex-grow w-48 pt-5 pb-4 border-r-2 bg-secondary border-accent-primary ">
 			<div className="h-16 px-4 sm:hidden" />
 			<div className="flex-shrink-0 block w-full">
 				<UserDropdown />
@@ -43,14 +42,14 @@ export default function Sidebar() {
 							<a
 								className={clsx(
 									checkActive(item.href)
-										? 'bg-accent-primary border-brand-primary text-primary'
-										: 'text-secondary hover:text-primary hover:bg-accent-secondary',
+										? 'bg-accent-primary text-primary'
+										: 'text-secondary  hover:bg-accent-secondary',
 									'group py-2 px-3 flex items-center text-sm font-medium'
 								)}
 							>
 								<item.icon
 									className={clsx(
-										{ 'text-secondary group-hover:text-primary': checkActive(item.href) },
+										{ 'text-brand-primary': checkActive(item.href) },
 										'mr-3 flex-shrink-0 h-5 w-5'
 									)}
 									aria-hidden="true"

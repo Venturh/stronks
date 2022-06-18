@@ -16,7 +16,7 @@ export default function AppLayout({ children, title }: Props) {
 			<Seo title={title} />
 			<div>
 				<AppNavigation sidebarOpen={sidebarOpen} setSidebarOpen={(open) => setSidebarOpen(open)} />
-				<div className="md:pl-64">
+				<div className="md:pl-64 ">
 					<div className="flex flex-col max-w-5xl mx-auto">
 						<div className="sticky top-0 z-50 flex items-center justify-between flex-shrink-0 h-16 px-4 sm:hidden ">
 							<button
@@ -29,7 +29,7 @@ export default function AppLayout({ children, title }: Props) {
 							</button>
 						</div>
 
-						<div className="px-2 py-3 overflow-scroll">{children}</div>
+						<div className="px-2 py-3 overflow-scroll ">{children}</div>
 					</div>
 				</div>
 			</div>

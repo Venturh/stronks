@@ -29,7 +29,7 @@ export default function SlideOver({ children, open, onClose, title }: Props) {
 								leaveFrom="translate-x-0"
 								leaveTo="translate-x-full"
 							>
-								<Dialog.Panel className="w-screen max-w-md pointer-events-auto">
+								<Dialog.Panel className="w-screen max-w-md pointer-events-auto bg-secondary">
 									<div className="flex flex-col h-full py-6 overflow-y-scroll border-l shadow-xl bg-secondary border-l-accent-primary">
 										<div className="px-4">
 											<div className="flex items-start justify-between">
