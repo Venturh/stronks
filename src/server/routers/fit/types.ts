@@ -31,7 +31,7 @@ export type AggregatedDataSourceResponse = {
 				startTimeNanos: number;
 				value: {
 					intVal?: number;
-					fpVal?: string | number;
+					fpVal?: number;
 					mapVal?: { key: string; value: { fpVal?: string | number } }[];
 					stringVal?: string;
 				}[];

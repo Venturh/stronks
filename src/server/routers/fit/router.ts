@@ -2,6 +2,7 @@ import { db } from 'lib/prisma';
 import { createRouter } from 'server/createRouter';
 import {
 	persistActivitySessionData,
+	persistActivityStepsData,
 	persistMeasurementsFitData,
 	persistNutritionFitData,
 } from './utils';
@@ -72,6 +73,9 @@ export const fitRouter = createRouter().mutation('retrieveFitnessData', {
 							break;
 						case FitType.syncSession:
 							await persistActivitySessionData(accessToken, user.id);
+							break;
+						case FitType.syncSteps:
+							await persistActivityStepsData(accessToken, user.id);
 							break;
 					}
 				})

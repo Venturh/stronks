@@ -58,10 +58,11 @@ model User {
     sessions              Session[]
     measurements          Measurements[]
     nutritions            Nutrition[]
+    Supplements           Supplements[]
     activitySessions      ActivitySession[]
+    activitySteps         ActivitySteps[]
     googleFitSettings     GoogleFitSetting[]
     additonal             Info[]
-    Supplements           Supplements[]
 }
 
 model GoogleFitSetting {
@@ -140,7 +141,7 @@ model Supplements {
     infoId         String?  @unique
     userId         String
     user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    Info           Info?    @relation(fields: [infoId], references: [id])
+    info           Info?    @relation(fields: [infoId], references: [id])
 }
 
 model ActivitySession {
@@ -160,6 +161,21 @@ model ActivitySession {
     info             Info?    @relation(fields: [infoId], references: [id])
 }
 
+model ActivitySteps {
+    id               String   @id @default(uuid())
+    objectId         String   @unique
+    steps            Float
+    distance         Float?
+    duration         Float?
+    calories         Float?
+    speed            Float?
+    measuredFormat   DateTime
+    userId           String
+    infoId           String?
+    user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    info             Info?    @relation(fields: [infoId], references: [id])
+}
+
 model Info {
     id               String            @id @default(uuid())
     measuredFormat   DateTime          @unique
@@ -169,6 +185,7 @@ model Info {
     measurements     Measurements[]
     nutritions       Nutrition[]
     activitySessions ActivitySession[]
+    activitySteps    ActivitySteps[]
     supplement       Supplements?
     user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

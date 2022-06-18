@@ -120,7 +120,7 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 
 	return (
 		<div>
-			<div className="relative shadow ring-1 ring-accent-primary md:rounded-lg">
+			<div className="relative shadow ring-1 bg-secondary ring-accent-primary md:rounded-lg">
 				<table className="min-w-full overflow-x-scroll divide-y table-fixed divide-accent-primary">
 					<thead>
 						{instance.getHeaderGroups().map((headerGroup) => (
