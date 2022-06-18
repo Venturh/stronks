@@ -49,7 +49,7 @@ const Button = forwardRef<any, ButtonProps>(
 					circle ? sizesCircle[size] : sizes[size],
 					variants[variant][color],
 					positions[position],
-					label ? 'flex flex-col' : 'inline-flex items-center',
+					{ 'flex flex-col': label },
 					{ 'rounded-md': rounded },
 					className
 				)}
@@ -61,7 +61,7 @@ const Button = forwardRef<any, ButtonProps>(
 							{label}
 						</label>
 					)}
-					<div className={clsx('flex items-center', { 'mt-1': label })}>
+					<div className={clsx('flex justify-between items-center', { 'mt-1': label })}>
 						{leftIcon && (
 							<ButtonIcon
 								className={clsx('mr-1.5 -ml-0.5', leadingIconClasses[size])}
@@ -90,7 +90,7 @@ const Button = forwardRef<any, ButtonProps>(
 									className="opacity-100"
 									fill="currentColor"
 									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-								></path>
+								/>
 							</svg>
 						)}
 					</div>
@@ -241,6 +241,6 @@ const trailingIconClasses = {
 };
 
 const positions = {
-	left: 'justify-start',
+	left: 'justify-between',
 	center: 'justify-center',
 };

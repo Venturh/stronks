@@ -6,6 +6,7 @@ import NestedMenu from 'components/ui/NestedMenu';
 import { MenuItem } from 'components/ui/Menu';
 import { trpc } from 'utils/trpc';
 import { Phase } from '@prisma/client';
+import Button from 'components/ui/Button';
 
 type Props = {
 	imageOnly?: boolean;
@@ -55,26 +56,15 @@ export default function UserDropdown({ imageOnly }: Props) {
 						alt="userImg"
 					/>
 				) : (
-					<div className="group w-full bg-secondary rounded-md px-3.5 py-2 text-sm text-left font-medium text-seco  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-accent-primary focus:ring-accent-primary">
-						<span className="flex items-center justify-between w-full">
-							<span className="flex items-center justify-between min-w-0 space-x-3">
-								<img
-									className="flex-shrink-0 w-10 h-10 bg-gray-300 rounded-full"
-									src={data.image ?? ''}
-									alt=""
-								/>
-								<span className="flex flex-col flex-1 min-w-0">
-									<span className="text-sm font-medium truncate text-primary">{data.name}</span>
-									<span className="text-sm capitalize truncate text-secondary">
-										{data.phase?.toLowerCase()}
-									</span>
-								</span>
-							</span>
-							<SelectorIcon
-								className="flex-shrink-0 w-5 h-5 text-gray-400 group-hover:text-gray-500"
-								aria-hidden="true"
-							/>
-						</span>
+					<div className="w-full ">
+						<Button variant="ghost" position="left" className="w-full" rightIcon={<SelectorIcon />}>
+							<div className="text-left ">
+								<p className="text-sm truncate text-primary">{data.name}</p>
+								<p className="text-sm capitalize truncate text-secondary">
+									{data.phase?.toLowerCase()}
+								</p>
+							</div>
+						</Button>
 					</div>
 				)}
 			</NestedMenu>
