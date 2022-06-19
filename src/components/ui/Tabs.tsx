@@ -15,7 +15,7 @@ const Slot = ({ type, ...rest }: { type: React.ReactElement }) => {
 
 export default function Tabs({ options }: Props) {
 	return (
-		<Tab.Group>
+		<Tab.Group as="div">
 			<Tab.List className="flex p-1 space-x-1 rounded-xl ring-1 bg-secondary ring-accent-primary">
 				{options.map(({ label }) => (
 					<Tab

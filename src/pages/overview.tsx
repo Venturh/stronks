@@ -7,7 +7,7 @@ export default function Home() {
 	const { data } = trpc.useQuery(['overview.index']);
 
 	return (
-		<AppLayout title="Overview">
+		<AppLayout title="Overview" small>
 			{data && (
 				<OverviewTable
 					items={data.items}

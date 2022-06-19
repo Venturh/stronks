@@ -10,8 +10,7 @@ const defaultGoogleFitSetting = Prisma.validator<Prisma.GoogleFitSettingSelect>(
 	syncBodyFat: true,
 	syncSteps: true,
 	syncNutrition: true,
-	syncActivity: true,
-	syncSession: true,
+	syncWorkout: true,
 	createdAt: true,
 	updatedAt: true,
 });
@@ -25,7 +24,7 @@ export const syncSettings = createRouter()
 			syncBodyFat: z.boolean().optional(),
 			syncNutrition: z.boolean().optional(),
 			syncActivity: z.boolean().optional(),
-			syncSession: z.boolean().optional(),
+			syncWorkout: z.boolean().optional(),
 		}),
 		async resolve({ input: { id, ...data } }) {
 			return await db.googleFitSetting.update({

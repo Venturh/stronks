@@ -120,65 +120,63 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 
 	return (
 		<div>
-			<div className="relative shadow ring-1 bg-secondary ring-accent-primary md:rounded-lg">
-				<table className="min-w-full overflow-x-scroll divide-y table-fixed divide-accent-primary">
-					<thead>
-						{instance.getHeaderGroups().map((headerGroup) => (
-							<tr key={headerGroup.id}>
-								{headerGroup.headers.map((header) => (
-									<th
-										className="font-medium tracking-wider text-left uppercase text-primary"
-										key={header.id}
-										colSpan={header.colSpan}
-									>
-										<NestedMenu
-											className="py-4 px-1.5 font-medium tracking-wider text-left uppercase text-xxs text-primary"
-											menuItems={[
-												{
-													items: [
-														{
-															text: 'Hide column',
-															icon: <EyeOffIcon />,
-															action: async () => {
-																header.column.toggleVisibility(false);
-																await editColumVisibility(header.column.id, false);
-															},
+			<table className="relative min-w-full overflow-x-scroll divide-y shadow table-fixed divide-accent-primary ring-1 bg-secondary ring-accent-primary md:rounded-lg">
+				<thead>
+					{instance.getHeaderGroups().map((headerGroup) => (
+						<tr key={headerGroup.id}>
+							{headerGroup.headers.map((header) => (
+								<th
+									className="font-medium tracking-wider text-left uppercase text-primary"
+									key={header.id}
+									colSpan={header.colSpan}
+								>
+									<NestedMenu
+										className="py-4 px-1.5 font-medium tracking-wider text-left uppercase text-xxs text-primary"
+										menuItems={[
+											{
+												items: [
+													{
+														text: 'Hide column',
+														icon: <EyeOffIcon />,
+														action: async () => {
+															header.column.toggleVisibility(false);
+															await editColumVisibility(header.column.id, false);
 														},
-													],
-												},
-											]}
-										>
-											<span>{header.isPlaceholder ? null : header.renderHeader()}</span>
-										</NestedMenu>
-									</th>
-								))}
-								<th className="py-4 px-1.5 font-medium tracking-wider text-left uppercase text-xxs text-primary">
-									<IconButton
-										onClick={() => setOpen(!open)}
-										color="primary"
-										size="xs"
-										variant="ghost"
-										fullRounded
-										icon={<DotsHorizontalIcon />}
-										ariaLabel="settings"
-									/>
+													},
+												],
+											},
+										]}
+									>
+										<span>{header.isPlaceholder ? null : header.renderHeader()}</span>
+									</NestedMenu>
 								</th>
-							</tr>
-						))}
-					</thead>
-					<tbody className="relative divide-y divide-accent-primary">
-						{instance.getRowModel().rows.map((row) => (
-							<tr key={row.id}>
-								{row.getVisibleCells().map((cell) => (
-									<td className="px-2 py-3 text-sm text-left w-28 whitespace-nowrap" key={cell.id}>
-										{cell.renderCell()}
-									</td>
-								))}
-							</tr>
-						))}
-					</tbody>
-				</table>
-			</div>
+							))}
+							<th className="py-4 px-1.5 font-medium tracking-wider text-left uppercase text-xxs text-primary">
+								<IconButton
+									onClick={() => setOpen(!open)}
+									color="primary"
+									size="xs"
+									variant="ghost"
+									fullRounded
+									icon={<DotsHorizontalIcon />}
+									ariaLabel="settings"
+								/>
+							</th>
+						</tr>
+					))}
+				</thead>
+				<tbody className="relative divide-y divide-accent-primary">
+					{instance.getRowModel().rows.map((row) => (
+						<tr key={row.id}>
+							{row.getVisibleCells().map((cell) => (
+								<td className="px-2 py-3 text-sm text-left w-28 whitespace-nowrap" key={cell.id}>
+									{cell.renderCell()}
+								</td>
+							))}
+						</tr>
+					))}
+				</tbody>
+			</table>
 			<SlideOver title="Settings" open={open} onClose={() => setOpen(false)}>
 				<ReactSortable
 					className="divide-y divide-accent-primary"

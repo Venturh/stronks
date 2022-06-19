@@ -10,8 +10,6 @@ import {
 	FitSession,
 } from './types';
 import { toStartOfDay } from 'utils/date';
-import { group } from 'console';
-import { groupBy } from 'lodash';
 
 export async function getSessionData(accessToken: string) {
 	const startTime = dayjs().subtract(2, 'months').toISOString();
@@ -149,7 +147,7 @@ export async function persistNutritionFitData(
 	);
 }
 
-export async function persistActivitySessionData(accessToken: string, userId: string) {
+export async function persistWorkoutData(accessToken: string, userId: string) {
 	const { bucket } = await getAggregatedData(
 		accessToken,
 		['com.google.calories.expended', 'com.google.active_minutes'],
@@ -180,7 +178,7 @@ export async function persistActivitySessionData(accessToken: string, userId: st
 			return data;
 		})
 	);
-	await db.activitySession.createMany({ skipDuplicates: true, data });
+	await db.workouts.createMany({ skipDuplicates: true, data });
 }
 
 export async function persistActivityStepsData(accessToken: string, userId: string) {
@@ -208,7 +206,7 @@ export async function persistActivityStepsData(accessToken: string, userId: stri
 
 			const measuredAt = dayjs.unix(startTimeMillis / 1000).toDate();
 			const measuredFormat = toStartOfDay(measuredAt);
-			const objectId = makeApiUuid([measuredAt.toString()]);
+			const objectId = makeApiUuid([measuredFormat.toString()]);
 
 			const data = {
 				measuredFormat,

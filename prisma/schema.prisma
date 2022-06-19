@@ -59,7 +59,7 @@ model User {
     measurements          Measurements[]
     nutritions            Nutrition[]
     Supplements           Supplements[]
-    activitySessions      ActivitySession[]
+    workouts              Workouts[]
     activitySteps         ActivitySteps[]
     googleFitSettings     GoogleFitSetting[]
     additonal             Info[]
@@ -71,8 +71,7 @@ model GoogleFitSetting {
     syncWeight    Boolean  @default(false)
     syncBodyFat   Boolean  @default(false)
     syncSteps     Boolean  @default(false)
-    syncActivity  Boolean  @default(false)
-    syncSession   Boolean  @default(false)
+    syncWorkout   Boolean  @default(false)
     syncNutrition Boolean  @default(false)
     createdAt     DateTime @default(now())
     updatedAt     DateTime @default(now())
@@ -144,7 +143,7 @@ model Supplements {
     info           Info?    @relation(fields: [infoId], references: [id])
 }
 
-model ActivitySession {
+model Workouts {
     id               String   @id @default(uuid())
     objectId         String   @unique
     name             String
@@ -162,30 +161,30 @@ model ActivitySession {
 }
 
 model ActivitySteps {
-    id               String   @id @default(uuid())
-    objectId         String   @unique
-    steps            Float
-    distance         Float?
-    duration         Float?
-    calories         Float?
-    speed            Float?
-    measuredFormat   DateTime
-    userId           String
-    infoId           String?
-    user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    info             Info?    @relation(fields: [infoId], references: [id])
+    id             String   @id @default(uuid())
+    objectId       String   @unique
+    steps          Float
+    distance       Float?
+    duration       Float?
+    calories       Float?
+    speed          Float?
+    measuredFormat DateTime
+    userId         String
+    infoId         String?
+    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    info           Info?    @relation(fields: [infoId], references: [id])
 }
 
 model Info {
-    id               String            @id @default(uuid())
-    measuredFormat   DateTime          @unique
-    phase            Phase?            @default(MAINTAIN)
-    notes            String?
-    userId           String
-    measurements     Measurements[]
-    nutritions       Nutrition[]
-    activitySessions ActivitySession[]
-    activitySteps    ActivitySteps[]
-    supplement       Supplements?
-    user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id             String          @id @default(uuid())
+    measuredFormat DateTime        @unique
+    phase          Phase?          @default(MAINTAIN)
+    notes          String?
+    userId         String
+    measurements   Measurements[]
+    nutritions     Nutrition[]
+    workouts       Workouts[]
+    activitySteps  ActivitySteps[]
+    supplement     Supplements?
+    user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

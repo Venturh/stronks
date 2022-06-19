@@ -22,10 +22,9 @@ export default function Settings() {
 
 	const [syncWeight, setSyncWeight] = useState(data?.syncWeight ?? false);
 	const [syncBodyFat, setSyncBodyFat] = useState(data?.syncBodyFat ?? false);
-	const [syncActivity, setSyncActivity] = useState(data?.syncActivity ?? false);
-	const [syncSteps, setSyncSteps] = useState(data?.syncActivity ?? false);
+	const [syncSteps, setSyncSteps] = useState(data?.syncSteps ?? false);
 	const [syncNutrition, setSyncNutrition] = useState(data?.syncNutrition ?? false);
-	const [syncSession, setSyncSession] = useState(data?.syncSession ?? false);
+	const [syncWorkout, setSyncWorkout] = useState(data?.syncWorkout ?? false);
 
 	return (
 		<SettingsLayout>
@@ -73,23 +72,12 @@ export default function Settings() {
 				</div>
 				<div className="py-4">
 					<Switch
-						label="Session"
-						description="This will sync your session (training) from Google Fit."
-						checked={syncSession}
+						label="Workouts"
+						description="This will sync your workouts from Google Fit."
+						checked={syncWorkout}
 						onChange={(value) => {
-							setSyncSession(value);
-							toggle.mutateAsync({ id: data?.id ?? '', syncSession: value });
-						}}
-					/>
-				</div>
-				<div className="py-4">
-					<Switch
-						label="Activity"
-						description="This will sync your activity from Google Fit."
-						checked={syncActivity}
-						onChange={(value) => {
-							setSyncActivity(value);
-							toggle.mutateAsync({ id: data?.id ?? '', syncActivity: value });
+							setSyncWorkout(value);
+							toggle.mutateAsync({ id: data?.id ?? '', syncWorkout: value });
 						}}
 					/>
 				</div>

@@ -4,7 +4,7 @@ import {
 	ColorSwatchIcon,
 	FireIcon,
 	HomeIcon,
-	LightBulbIcon,
+	LightningBoltIcon,
 	CollectionIcon,
 } from '@heroicons/react/outline';
 import clsx from 'clsx';
@@ -20,8 +20,7 @@ export default function Sidebar() {
 		{ name: 'Measurements', href: '/measurements', icon: ColorSwatchIcon },
 		{ name: 'Nutrition', href: '/nutrition', icon: BeakerIcon },
 		{ name: 'Workouts', href: '/workouts', icon: FireIcon },
-		{ name: 'Activity', href: '/activity', icon: LightBulbIcon },
-		{ name: 'Settings', href: '/settings/sync', icon: CogIcon },
+		{ name: 'Steps', href: '/steps', icon: LightningBoltIcon },
 	];
 
 	const { pathname } = useRouter();

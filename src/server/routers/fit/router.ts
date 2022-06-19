@@ -1,19 +1,18 @@
 import { db } from 'lib/prisma';
 import { createRouter } from 'server/createRouter';
 import {
-	persistActivitySessionData,
+	persistWorkoutData,
 	persistActivityStepsData,
 	persistMeasurementsFitData,
 	persistNutritionFitData,
 } from './utils';
 
 enum FitType {
-	syncActivity = 'syncActivity',
 	syncSteps = 'syncSteps',
 	syncWeight = 'syncWeight',
 	syncBodyfat = 'syncBodyfat',
 	syncNutrition = 'syncNutrition',
-	syncSession = 'syncSession',
+	syncWorkout = 'syncWorkout',
 }
 
 export const fitRouter = createRouter().mutation('retrieveFitnessData', {
@@ -26,16 +25,10 @@ export const fitRouter = createRouter().mutation('retrieveFitnessData', {
 			const settings = await db.googleFitSetting.findFirst({ where: { userId: user.id } });
 			const enabledSettings: { name: FitType; dataSourceId: string; enabled: boolean }[] = [
 				{
-					name: FitType.syncSession,
+					name: FitType.syncWorkout,
 					dataSourceId:
 						'derived:com.google.activity.segment:com.google.android.gms:session_activity_segment',
-					enabled: settings!.syncSession,
-				},
-				{
-					name: FitType.syncActivity,
-					dataSourceId:
-						'derived:com.google.activity.segment:com.google.android.gms:session_activity_segment',
-					enabled: settings!.syncActivity,
+					enabled: settings!.syncWorkout,
 				},
 				{
 					name: FitType.syncSteps,
@@ -71,8 +64,8 @@ export const fitRouter = createRouter().mutation('retrieveFitnessData', {
 						case FitType.syncNutrition:
 							await persistNutritionFitData(dataSourceId, accessToken, user.id);
 							break;
-						case FitType.syncSession:
-							await persistActivitySessionData(accessToken, user.id);
+						case FitType.syncWorkout:
+							await persistWorkoutData(accessToken, user.id);
 							break;
 						case FitType.syncSteps:
 							await persistActivityStepsData(accessToken, user.id);

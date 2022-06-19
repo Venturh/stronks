@@ -24,7 +24,7 @@ export default function UserDropdown({ imageOnly }: Props) {
 	});
 
 	const dropdownItems = [
-		{ text: 'Settings', icon: <CogIcon />, to: '/settings' },
+		{ text: 'Settings', icon: <CogIcon />, to: '/settings/sync' },
 		{ text: 'Sign Out', icon: <LogoutIcon />, action: () => signOut() },
 	];
 	const phaseItems: MenuItem[] = [
@@ -44,14 +44,18 @@ export default function UserDropdown({ imageOnly }: Props) {
 		changePase.mutate({ data: { phase, email: email!, name: name! } });
 	}
 
+	const menuItems = imageOnly
+		? [{ items: dropdownItems }]
+		: [{ label: 'Phase', items: phaseItems }, { items: dropdownItems }];
+
 	if (data) {
 		return (
-			<NestedMenu menuItems={[{ label: 'Phase', items: phaseItems }, { items: dropdownItems }]}>
+			<NestedMenu menuItems={menuItems}>
 				{imageOnly ? (
 					<Image
-						className="flex-shrink-0 rounded-full"
-						width={24}
-						height={24}
+						className="flex-shrink-0 rounded-full cursor-pointer"
+						width={28}
+						height={28}
 						src={data.image ?? ''}
 						alt="userImg"
 					/>

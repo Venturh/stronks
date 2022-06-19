@@ -1,15 +1,21 @@
-import { ComponentProps } from 'react';
+import clsx from 'clsx';
+import { ComponentProps, ReactChild } from 'react';
+import Clickable from './Clickable';
 import EmptyState from './EmptyState';
 
-type Props = { children: React.ReactChild[]; grouped?: boolean };
+type Props = { children?: ReactChild | ReactChild[]; grouped?: boolean };
 
 export function StackedList({ grouped, children }: Props) {
-	if (children.length === 0) {
+	if (!children || (Array.isArray(children) && children.length === 0)) {
 		return <EmptyState title="No data" />;
 	}
 	return (
-		<div className="">
-			{grouped ? children : <ul className="-my-1 divide-y divide-accent-primary">{children}</ul>}
+		<div>
+			{grouped ? (
+				<div className="border rounded border-accent-primary">{children}</div>
+			) : (
+				<ul className="rounded-md bg-secondary">{children}</ul>
+			)}
 		</div>
 	);
 }
@@ -17,7 +23,7 @@ export function StackedList({ grouped, children }: Props) {
 type StackedListHeaderProps = ComponentProps<'div'> & {
 	primary: string;
 	seconary?: string;
-	children?: React.ReactChild[];
+	children?: ReactChild | ReactChild[];
 };
 
 export function StackedListHeader({
@@ -30,13 +36,13 @@ export function StackedListHeader({
 		<div {...rest}>
 			{children && (
 				<>
-					<div className="sticky top-0 z-10 p-2 text-sm font-medium border-t border-b text-secondary border-accent-primary bg-accent-primary">
+					<div className="sticky top-0 z-10 px-2 py-4 text-sm font-medium text-secondary ">
 						<div className="flex justify-between ">
-							<span>{primary} </span>
+							<span className="capitalize">{primary} </span>
 							{seconary && <span>{seconary}</span>}
 						</div>
 					</div>
-					<ul className="-my-1 divide-y divide-accent-primary">{children}</ul>
+					<ul className="rounded-md bg-secondary">{children}</ul>
 				</>
 			)}
 		</div>
@@ -45,18 +51,28 @@ export function StackedListHeader({
 
 type StackedListItemProps = ComponentProps<'li'> & {
 	primary: string;
-	secondary: string;
+	secondary?: string;
 	tertiary?: string;
+	href?: string;
 };
 
-export function StackedListItem({ primary, secondary, tertiary, ...rest }: StackedListItemProps) {
+export function StackedListItem({
+	primary,
+	secondary,
+	tertiary,
+	href,
+	...rest
+}: StackedListItemProps) {
+	const Component = href ? Clickable : 'div';
 	return (
-		<li className="p-2 text-primary hover:bg-accent-secondary" {...rest}>
-			<span className="text-sm ">{secondary}</span>
-			<div className="flex justify-between">
-				<div className="mt-1">{primary}</div>
-				<span className="text-sm text-secondary">{tertiary}</span>
-			</div>
-		</li>
+		<Component href={href}>
+			<li className={clsx('p-2 text-primary', { 'hover:bg-accent-secondary': href })} {...rest}>
+				{secondary && <span className="text-sm capitalize">{secondary}</span>}
+				<div className="flex justify-between">
+					<div className="mt-1">{primary}</div>
+					{tertiary && <span className="text-sm min-w-fit text-secondary">{tertiary}</span>}
+				</div>
+			</li>
+		</Component>
 	);
 }

@@ -1,27 +1,25 @@
-import { Prisma } from '@prisma/client';
-
-import { db } from 'lib/prisma';
+import { z } from 'zod';
 import { groupBy } from 'lodash';
 import { createRouter } from 'server/createRouter';
 
-const defaultSelect = Prisma.validator<Prisma.NutritionSelect>()({
-	id: true,
-	objectId: true,
-	name: true,
-	calories: true,
-	measuredFormat: true,
-	fat: true,
-	protein: true,
-	measuredAt: true,
-});
+import { db } from 'lib/prisma';
 
-export const nutritionRouter = createRouter().query('index', {
-	async resolve({ ctx }) {
-		const nutrition = await db.nutrition.findMany({
-			where: { userId: ctx.session?.user?.id },
-			select: defaultSelect,
-			orderBy: { measuredAt: 'desc' },
-		});
-		return groupBy(nutrition, (d) => d.measuredFormat);
-	},
-});
+export const nutritionRouter = createRouter()
+	.query('index', {
+		async resolve({ ctx: { user } }) {
+			const items =
+				(await db.$queryRaw`SELECT"measuredFormat","category",SUM("calories")as calories,string_agg("name",', ')as foodnames FROM "Nutrition" WHERE "userId"=${user?.id} GROUP BY"category","measuredFormat" ORDER BY"measuredFormat" DESC;
+    `) as { measuredFormat: string; category: string; calories: number; foodnames: string }[];
+			return groupBy(items, 'measuredFormat');
+		},
+	})
+	.query('show', {
+		input: z.object({
+			category: z.string(),
+			measuredFormat: z.string(),
+		}),
+		async resolve({ input }) {
+			const { category, measuredFormat } = input;
+			return db.nutrition.findMany({ where: { category, measuredFormat } });
+		},
+	});

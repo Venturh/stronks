@@ -18,9 +18,9 @@ export type NavLink = {
 
 const navLinks = [
 	{
-		name: 'Home',
-		description: 'Home',
-		href: '/home',
+		name: 'Dashboard',
+		description: 'Dashboard',
+		href: '/overview',
 		icon: HomeIcon,
 		protected: true,
 	},
@@ -59,10 +59,17 @@ export default function LandingNavigation() {
 								</Disclosure.Button>
 							</div>
 
-							<div className="flex justify-start items-strcetch">
+							<div className="flex items-center justify-start">
 								<div className="hidden md:flex">
 									<Logo />
 								</div>
+							</div>
+
+							<div className="md:hidden">
+								<Logo />
+							</div>
+
+							<div className="flex items-center">
 								<div className="hidden sm:block sm:ml-6">
 									<div className="flex space-x-4">
 										{filteredNavLinks(navLinks, Boolean(data?.user)).map((link) => {
@@ -73,7 +80,7 @@ export default function LandingNavigation() {
 															pathname.startsWith(`/${link.href.split('/')[1]}`)
 																? 'bg-accent-primary text-primary'
 																: 'text-primary hover:bg-accent-secondary hover:text-secondary',
-															'p-2 font-medium rounded-lg'
+															'p-2 text-sm font-medium rounded-lg'
 														)}
 													>
 														{link.name}
@@ -83,19 +90,15 @@ export default function LandingNavigation() {
 										})}
 									</div>
 								</div>
-							</div>
-
-							<div className="md:hidden">
-								<Logo />
-							</div>
-							<div className="flex items-center pr-2 sm:static sm:inset-auto sm:pr-0 sm:ml-6">
-								{data?.user ? (
-									<UserDropdown imageOnly />
-								) : (
-									<Button size="sm" variant="solid" href="/auth/login">
-										Login
-									</Button>
-								)}
+								<div className="sm:static sm:inset-auto sm:ml-5">
+									{data?.user ? (
+										<UserDropdown imageOnly />
+									) : (
+										<Button size="sm" variant="solid" href="/auth/login">
+											Login
+										</Button>
+									)}
+								</div>
 							</div>
 						</div>
 					</div>
