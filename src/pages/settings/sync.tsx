@@ -20,8 +20,7 @@ export default function Settings() {
 
 	const sync = trpc.useMutation(['fit.retrieveFitnessData']);
 
-	const [syncWeight, setSyncWeight] = useState(data?.syncWeight ?? false);
-	const [syncBodyFat, setSyncBodyFat] = useState(data?.syncBodyFat ?? false);
+	const [syncMeasurements, setSyncMeasurements] = useState(data?.syncMeasurements ?? false);
 	const [syncSteps, setSyncSteps] = useState(data?.syncSteps ?? false);
 	const [syncNutrition, setSyncNutrition] = useState(data?.syncNutrition ?? false);
 	const [syncWorkout, setSyncWorkout] = useState(data?.syncWorkout ?? false);
@@ -40,22 +39,11 @@ export default function Settings() {
 				<div className="py-4">
 					<Switch
 						label="Weight"
-						description="This will sync your weight from Google Fit."
-						checked={syncWeight}
+						description="This will sync your weight and body fat from Google Fit."
+						checked={syncMeasurements}
 						onChange={(value) => {
-							setSyncWeight(value);
-							toggle.mutateAsync({ id: data?.id ?? '', syncWeight: value });
-						}}
-					/>
-				</div>
-				<div className="py-4">
-					<Switch
-						label="Body Fat"
-						description="This will sync your body fat percentage from Google Fit."
-						checked={syncBodyFat}
-						onChange={(value) => {
-							setSyncBodyFat(value);
-							toggle.mutateAsync({ id: data?.id ?? '', syncBodyFat: value });
+							setSyncMeasurements(value);
+							toggle.mutateAsync({ id: data?.id ?? '', syncMeasurements: value });
 						}}
 					/>
 				</div>

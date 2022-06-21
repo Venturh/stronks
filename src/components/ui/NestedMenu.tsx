@@ -31,7 +31,7 @@ export default function NestedMenu({ menuItems, children, ...rest }: Props) {
 					className={clsx(
 						' radix-side-top:animate-slide-up radix-side-bottom:animate-slide-down',
 						'min-w-[14em] rounded-lg px-1.5 py-1 shadow-md w-full',
-						'bg-secondary'
+						'bg-secondary ring-1 ring-accent-primary'
 					)}
 				>
 					{menuItems.map(({ label, items }, i) => (
@@ -83,7 +83,7 @@ export default function NestedMenu({ menuItems, children, ...rest }: Props) {
 												className={clsx(
 													'ml-3 origin-radix-dropdown-menu radix-side-right:animate-scale-in',
 													'w-full rounded-md px-1 py-1 text-sm shadow-md',
-													'bg-secondary'
+													'bg-secondary ring-1 ring-accent-primary'
 												)}
 											>
 												{item.nested.map((item, i) => (

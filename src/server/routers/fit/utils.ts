@@ -1,94 +1,50 @@
-import axios, { AxiosResponse } from 'axios';
 import dayjs from 'dayjs';
 import uuidByString from 'uuid-by-string';
 
 import { db } from 'lib/prisma';
-import {
-	activityTypeMapping,
-	AggregatedDataSourceResponse,
-	DataSourceResponse,
-	FitSession,
-} from './types';
+import { getAggregatedData, getDatasetData } from './api';
+
 import { toStartOfDay } from 'utils/date';
+import { activityTypeMapping } from './types';
 
-export async function getSessionData(accessToken: string) {
-	const startTime = dayjs().subtract(2, 'months').toISOString();
-	const { data }: AxiosResponse<FitSession> = await axios.get(
-		`https://www.googleapis.com/fitness/v1/users/me/sessions/?startTime=${startTime}`,
-		{ headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' } }
-	);
-	return data;
-}
+export async function persistMeasurementsFitData(userId: string, accessToken: string) {
+	const { bucket } = await getAggregatedData(accessToken, [
+		'com.google.weight',
+		'com.google.body.fat.percentage',
+	]);
+	const data = await Promise.all(
+		bucket
+			.map(async (buck) => {
+				const { dataset, startTimeMillis } = buck;
+				const weightDataSet = dataset[0]!.point[0]!;
+				const bodyFatDataSet = dataset[1].point[0];
 
-export async function getDatasetData(accessToken: string, dataSourceId: string) {
-	const startTime = dayjs().subtract(2, 'months').unix() * 1000000000;
-	const endTime = dayjs().subtract(0, 'days').unix() * 1000000000;
-	const { data }: AxiosResponse<DataSourceResponse> = await axios.get(
-		`https://www.googleapis.com/fitness/v1/users/me/dataSources/${dataSourceId}/datasets/${endTime}-${startTime}`,
-		{ headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' } }
-	);
-	return data;
-}
-export async function getAggregatedData(
-	accessToken: string,
-	dataTypeNames: string[],
-	aggregation: 'bucketBySession' | 'bucketByActivitySegment' | 'bucketByTime' = 'bucketByTime'
-) {
-	const startTime = dayjs().subtract(2, 'months').unix() * 1000;
-	const endTime = dayjs().subtract(0, 'days').unix() * 1000;
-	const { data }: AxiosResponse<AggregatedDataSourceResponse> = await axios.post(
-		'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',
-		{
-			aggregateBy: [
-				dataTypeNames.map((dataTypeName) => {
-					if (dataTypeName === 'com.google.step_count.delta')
-						return {
-							dataTypeName,
-							dataSourceId:
-								'derived:com.google.step_count.delta:com.google.android.gms:estimated_steps',
-						};
-					return {
-						dataTypeName,
-					};
-				}),
-			],
-			[aggregation]: {
-				durationMillis: 86400000,
-			},
-			endTimeMillis: endTime,
-			startTimeMillis: startTime,
-		},
-		{ headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' } }
-	);
-	return data;
-}
+				const measuredAt = dayjs.unix(startTimeMillis / 1000).toDate();
+				const measuredFormat = toStartOfDay(measuredAt);
+				const objectId = makeApiUuid([measuredFormat.toString()]);
 
-export async function persistMeasurementsFitData(
-	dataSourceId: string,
-	key: string,
-	userId: string,
-	accessToken: string
-) {
-	const { point } = await getDatasetData(accessToken, dataSourceId);
-	return await Promise.all(
-		point.map(async ({ value, startTimeNanos }) => {
-			const measuredFormat = toStartOfDay(startTimeNanos / 1000000);
-			const objectId = makeApiUuid([measuredFormat.toString()]);
+				if (!weightDataSet?.value || !bodyFatDataSet?.value) return;
 
-			const v = value[0].fpVal;
-			return db.measurements.upsert({
-				where: { objectId },
-				update: { [key]: v as number, userId, measuredFormat },
-				create: {
-					[key]: v as number,
+				const data = {
+					measuredAt,
+					measuredFormat,
 					userId,
 					objectId,
-					measuredFormat,
+					weight: weightDataSet.value[1].fpVal as number,
+					bodyFat: bodyFatDataSet.value[1].fpVal as number,
 					infoId: await createOrUpateInfo(measuredFormat, userId),
-				},
-			});
-		})
+				};
+
+				return data;
+			})
+			.filter((d) => d !== undefined)
 	);
+
+	await db.measurements.createMany({
+		skipDuplicates: true,
+		// @ts-expect-error yep
+		data,
+	});
 }
 
 export async function persistNutritionFitData(
@@ -234,7 +190,9 @@ async function createOrUpateInfo(measuredFormat: Date, userId: string) {
 	if (info) return info.id;
 	else {
 		const newInfo = await db.info.create({ data: { measuredFormat, userId } });
-		await db.supplements.create({ data: { infoId: newInfo.id, measuredFormat, userId } });
+		await db.supplements.create({
+			data: { infoId: newInfo.id, measuredFormat, userId },
+		});
 		return newInfo.id;
 	}
 }

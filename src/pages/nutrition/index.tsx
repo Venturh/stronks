@@ -1,6 +1,8 @@
 import AppLayout from 'components/layouts/AppLayout';
 import { StackedList, StackedListHeader, StackedListItem } from 'components/ui/StackedList';
+import WeekTrackCard from 'components/WeekTrackCard';
 import dayjs from 'dayjs';
+import { groupBy, sumBy } from 'lodash';
 
 import { toCalendarDate } from 'utils/date';
 import { authenticatedRoute } from 'utils/redirects';
@@ -18,7 +20,44 @@ export default function Home() {
 
 	return (
 		<AppLayout title="Nutrition" small>
-			{data && (
+			<WeekTrackCard
+				days={data?.stats.days}
+				primary={data?.stats.primary}
+				secondary={`${data?.stats.secondary} kcal per day`}
+			/>
+			<StackedList grouped>
+				{Object.entries(data?.items ?? {}).map(([date, items]) => {
+					const grouped = groupBy(items, 'measuredFormat');
+					return (
+						<StackedListHeader key={date} primary={date}>
+							<StackedList grouped>
+								{Object.entries(grouped).map(([measuredAt, items]) => (
+									<StackedListHeader
+										key={measuredAt}
+										primary={toCalendarDate(measuredAt)}
+										seconary={`${sumBy(items, 'calories')} kcal`}
+									>
+										{items
+											.sort((a, b) => priority[b.category] - priority[a.category])
+											.map(({ category, calories, foodnames, measuredFormat }, i) => (
+												<StackedListItem
+													href={`/nutrition/show?category=${category}&date=${dayjs(
+														measuredFormat
+													).toISOString()}`}
+													key={i}
+													primary={foodnames}
+													secondary={category}
+													tertiary={`${calories} kcal`}
+												/>
+											))}
+									</StackedListHeader>
+								))}
+							</StackedList>
+						</StackedListHeader>
+					);
+				})}
+			</StackedList>
+			{/* {data && (
 				<StackedList grouped>
 					{Object.entries(data).map(([date, items]) => {
 						return (
@@ -42,7 +81,7 @@ export default function Home() {
 						);
 					})}
 				</StackedList>
-			)}
+			)} */}
 		</AppLayout>
 	);
 }

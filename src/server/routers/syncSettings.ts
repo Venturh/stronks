@@ -6,8 +6,7 @@ import { createRouter } from 'server/createRouter';
 
 const defaultGoogleFitSetting = Prisma.validator<Prisma.GoogleFitSettingSelect>()({
 	id: true,
-	syncWeight: true,
-	syncBodyFat: true,
+	syncMeasurements: true,
 	syncSteps: true,
 	syncNutrition: true,
 	syncWorkout: true,
@@ -19,9 +18,8 @@ export const syncSettings = createRouter()
 	.mutation('toggle', {
 		input: z.object({
 			id: z.string().uuid(),
-			syncWeight: z.boolean().optional(),
+			syncMeasurements: z.boolean().optional(),
 			syncSteps: z.boolean().optional(),
-			syncBodyFat: z.boolean().optional(),
 			syncNutrition: z.boolean().optional(),
 			syncActivity: z.boolean().optional(),
 			syncWorkout: z.boolean().optional(),

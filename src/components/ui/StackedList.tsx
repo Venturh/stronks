@@ -36,7 +36,7 @@ export function StackedListHeader({
 		<div {...rest}>
 			{children && (
 				<>
-					<div className="sticky top-0 z-10 px-2 py-4 text-sm font-medium text-secondary ">
+					<div className="sticky top-0 z-10 px-2 py-4 font-medium text-secondary ">
 						<div className="flex justify-between ">
 							<span className="capitalize">{primary} </span>
 							{seconary && <span>{seconary}</span>}
@@ -53,6 +53,7 @@ type StackedListItemProps = ComponentProps<'li'> & {
 	primary: string;
 	secondary?: string;
 	tertiary?: string;
+	quaternary?: string;
 	href?: string;
 };
 
@@ -60,17 +61,24 @@ export function StackedListItem({
 	primary,
 	secondary,
 	tertiary,
+	quaternary,
 	href,
 	...rest
 }: StackedListItemProps) {
 	const Component = href ? Clickable : 'div';
 	return (
 		<Component href={href}>
-			<li className={clsx('p-2 text-primary', { 'hover:bg-accent-secondary': href })} {...rest}>
-				{secondary && <span className="text-sm capitalize">{secondary}</span>}
+			<li
+				className={clsx('p-2 text-primary text-sm', { 'hover:bg-accent-secondary': href })}
+				{...rest}
+			>
 				<div className="flex justify-between">
-					<div className="mt-1">{primary}</div>
-					{tertiary && <span className="text-sm min-w-fit text-secondary">{tertiary}</span>}
+					{secondary && <span className="capitalize min-w-fit text-secondary">{secondary}</span>}
+					{quaternary && <span className=" min-w-fit text-secondary">{quaternary}</span>}
+				</div>
+				<div className="flex items-center justify-between">
+					<div className="mt-1 ">{primary}</div>
+					{tertiary && <span className=" min-w-fit">{tertiary}</span>}
 				</div>
 			</li>
 		</Component>

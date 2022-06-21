@@ -24,3 +24,10 @@ export function toCalendarDate(date: Date | string) {
 export function toStartOfDay(date: Date | Dayjs | string | number) {
 	return dayjs(date).hour(2).minute(0).second(0).millisecond(0).toDate();
 }
+
+export function getMonth(d: any) {
+	const month = dayjs(d.measuredFormat).format('MMMM');
+	const currentMonth = dayjs().format('MMMM');
+	const lastMonth = dayjs().subtract(1, 'month').format('MMMM');
+	return month === currentMonth ? 'Current Month' : month === lastMonth ? 'Last Month' : month;
+}

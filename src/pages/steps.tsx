@@ -1,5 +1,6 @@
 import AppLayout from 'components/layouts/AppLayout';
 import { StackedList, StackedListHeader, StackedListItem } from 'components/ui/StackedList';
+import WeekTrackCard from 'components/WeekTrackCard';
 import { toCalendarDate } from 'utils/date';
 
 import { toFixed } from 'utils/misc';
@@ -11,20 +12,27 @@ export default function Home() {
 
 	return (
 		<AppLayout title="Steps" small>
-			{data && (
-				<StackedList grouped>
-					{data.map(({ duration, steps, measuredFormat }, i) => {
-						return (
-							<StackedListHeader key={i} primary={toCalendarDate(measuredFormat)}>
+			<WeekTrackCard
+				days={data?.stats.days}
+				primary={data?.stats.primary}
+				secondary={`${data?.stats.secondary} steps per day`}
+			/>
+			<StackedList grouped>
+				{Object.entries(data?.items ?? {}).map(([date, items], i) => {
+					return (
+						<StackedListHeader key={i} primary={date}>
+							{items.map(({ id, steps, duration, measuredFormat }) => (
 								<StackedListItem
+									key={id}
 									primary={`${toFixed(steps, 0, 0)} Steps`}
-									secondary={`${duration ?? 0}  min`}
+									secondary={toCalendarDate(measuredFormat)}
+									tertiary={`${duration ?? 0}  min`}
 								/>
-							</StackedListHeader>
-						);
-					})}
-				</StackedList>
-			)}
+							))}
+						</StackedListHeader>
+					);
+				})}
+			</StackedList>
 		</AppLayout>
 	);
 }

@@ -9,6 +9,7 @@ import { authenticatedRoute } from 'utils/redirects';
 import { toCalendarDate } from 'utils/date';
 
 import type { Measurements } from '@prisma/client';
+import WeekTrackCard from 'components/WeekTrackCard';
 
 export default function Weights() {
 	const { data } = trpc.useQuery(['measurements.index']);
@@ -37,6 +38,11 @@ export default function Weights() {
 	return (
 		<AppLayout title="Measurments" small>
 			<div>
+				<WeekTrackCard
+					days={data?.stats.days}
+					primary={data?.stats.primary}
+					secondary={data?.stats.secondary}
+				/>
 				<nav className="flex mb-2 space-x-8 rounded-xl ring-1 bg-secondary ring-accent-primary">
 					{tabs.map((tab) => (
 						<button
@@ -58,7 +64,7 @@ export default function Weights() {
 			</div>
 
 			<StackedList grouped>
-				{Object.entries(data ?? {})?.map(([month, measurments]) => {
+				{Object.entries(data?.items ?? {})?.map(([month, measurments]) => {
 					const secondary = `${new Intl.NumberFormat('en-US', {
 						signDisplay: 'exceptZero',
 					}).format(

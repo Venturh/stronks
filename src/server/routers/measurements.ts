@@ -1,32 +1,34 @@
-import { Prisma } from '@prisma/client';
 import dayjs from 'dayjs';
+import { groupBy } from 'lodash';
 
 import { db } from 'lib/prisma';
-import { groupBy } from 'lodash';
-import { createRouter } from 'server/createRouter';
 
-const defaultMeasurements = Prisma.validator<Prisma.MeasurementsSelect>()({
-	id: true,
-	objectId: true,
-	weight: true,
-	bodyFat: true,
-	aditionalMeasurements: true,
-	measuredFormat: true,
-});
+import { createRouter } from 'server/createRouter';
+import { generateWeekyDayTrack } from 'server/utils/misc';
+import { getMonth } from 'utils/date';
 
 export const measurementsRouter = createRouter().query('index', {
 	async resolve({ ctx }) {
 		const measurements = await db.measurements.findMany({
 			where: { userId: ctx.session?.user?.id },
-			select: defaultMeasurements,
 			orderBy: { measuredFormat: 'desc' },
 		});
 
-		return groupBy(measurements, (d) => {
-			const month = dayjs(d.measuredFormat).format('MMMM');
-			const currentMonth = dayjs().format('MMMM');
-			const lastMonth = dayjs().subtract(1, 'month').format('MMMM');
-			return month === currentMonth ? 'Current Month' : month === lastMonth ? 'Last Month' : month;
+		const items = groupBy(measurements, (d) => getMonth(d));
+
+		const stats = { primary: 0, secondary: 0 };
+
+		const latestMeasurements = measurements.filter(
+			(w) => w.measuredAt >= dayjs().subtract(new Date().getDay(), 'day').toDate()
+		);
+
+		const { days } = generateWeekyDayTrack(latestMeasurements, (ms) => {
+			Object.assign(stats, {
+				primary: stats.primary + 1,
+				secondary: '',
+			});
 		});
+
+		return { items, stats: { ...stats, days } };
 	},
 });

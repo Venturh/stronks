@@ -7,10 +7,11 @@ import clsx from 'clsx';
 type Props = {
 	children: React.ReactNode;
 	title: string;
+	actions?: React.ReactNode;
 	small?: boolean;
 };
 
-export default function AppLayout({ children, title, small }: Props) {
+export default function AppLayout({ children, title, small, actions }: Props) {
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 
 	return (
@@ -33,11 +34,14 @@ export default function AppLayout({ children, title, small }: Props) {
 
 						<div className="px-2 overflow-scroll sm:px-0">
 							<div className={clsx({ 'max-w-2xl mx-auto': small })}>
-								{title && (
-									<h2 className="my-4 text-2xl font-bold leading-7 text-primary sm:text-3xl sm:truncate">
-										{title}
-									</h2>
-								)}
+								<div className="flex items-center justify-between">
+									{title && (
+										<h2 className="my-4 text-2xl font-bold leading-7 text-primary sm:text-3xl sm:truncate">
+											{title}
+										</h2>
+									)}
+									{actions && actions}
+								</div>
 								{children}
 							</div>
 						</div>

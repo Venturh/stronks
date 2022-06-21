@@ -125,7 +125,7 @@ const createOptions = (req: NextApiRequest): NextAuthOptions => ({
 	events: {
 		createUser: async ({ user }) => {
 			await db.googleFitSetting.create({
-				data: { syncActivity: false, syncSteps: false, syncWeight: false, userId: user.id },
+				data: { userId: user.id },
 			});
 			if (user.image === null) {
 				await db.user.update({

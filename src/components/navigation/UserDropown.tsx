@@ -1,6 +1,12 @@
 import Image from 'next/image';
 import { signOut } from 'next-auth/react';
-import { BookmarkIcon, CogIcon, LogoutIcon, SelectorIcon } from '@heroicons/react/outline';
+import {
+	BookmarkIcon,
+	CogIcon,
+	LogoutIcon,
+	RefreshIcon,
+	SelectorIcon,
+} from '@heroicons/react/outline';
 
 import NestedMenu from 'components/ui/NestedMenu';
 import { MenuItem } from 'components/ui/Menu';
@@ -17,6 +23,8 @@ export default function UserDropdown({ imageOnly }: Props) {
 
 	const context = trpc.useContext();
 
+	const sync = trpc.useMutation(['fit.retrieveFitnessData']);
+
 	const changePase = trpc.useMutation('user.edit', {
 		async onSuccess() {
 			context.invalidateQueries(['user.me']);
@@ -24,6 +32,12 @@ export default function UserDropdown({ imageOnly }: Props) {
 	});
 
 	const dropdownItems = [
+		{
+			text: 'Sync Data',
+			icon: <RefreshIcon />,
+			// loading: sync.isLoading,
+			action: async () => await sync.mutateAsync(),
+		},
 		{ text: 'Settings', icon: <CogIcon />, to: '/settings/sync' },
 		{ text: 'Sign Out', icon: <LogoutIcon />, action: () => signOut() },
 	];

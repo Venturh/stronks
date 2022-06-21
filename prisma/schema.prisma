@@ -66,22 +66,22 @@ model User {
 }
 
 model GoogleFitSetting {
-    id            String   @id @default(uuid())
-    userId        String
-    syncWeight    Boolean  @default(false)
-    syncBodyFat   Boolean  @default(false)
-    syncSteps     Boolean  @default(false)
-    syncWorkout   Boolean  @default(false)
-    syncNutrition Boolean  @default(false)
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @default(now())
-    user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id               String   @id @default(uuid())
+    userId           String
+    syncMeasurements Boolean  @default(false)
+    syncSteps        Boolean  @default(false)
+    syncWorkout      Boolean  @default(false)
+    syncNutrition    Boolean  @default(false)
+    createdAt        DateTime @default(now())
+    updatedAt        DateTime @default(now())
+    user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Measurements {
     id                    String              @id @default(uuid())
     objectId              String              @unique
     measuredFormat        DateTime            @unique
+    measuredAt            DateTime
     weight                Float?
     bodyFat               Float?
     infoId                String
