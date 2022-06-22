@@ -72,7 +72,7 @@ export async function persistNutritionFitData(
 			const [name, amount] = value[2].stringVal!.split(', ');
 
 			const measuredAtHours = dayjs(measuredAt).hour();
-			console.log('hour', measuredAtHours);
+			console.log('hour', measuredAtHours, name);
 			const category =
 				measuredAtHours < 12
 					? 'breakfast'
