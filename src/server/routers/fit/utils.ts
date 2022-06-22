@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 import uuidByString from 'uuid-by-string';
 
 import { db } from 'lib/prisma';
@@ -56,7 +58,7 @@ export async function persistNutritionFitData(
 	return await Promise.all(
 		point.flatMap(async ({ value, startTimeNanos }) => {
 			const objectId = makeApiUuid([startTimeNanos.toString()]);
-			const measuredAt = dayjs(startTimeNanos / 1000000).toDate();
+			const measuredAt = dayjs.utc(startTimeNanos / 1000000).toDate();
 			let nutrition = value[0].mapVal!.reduce<Record<string, string | number>>((acc, curr) => {
 				acc[curr.key] = curr.value.fpVal!;
 				return acc;
@@ -69,7 +71,8 @@ export async function persistNutritionFitData(
 			};
 			const [name, amount] = value[2].stringVal!.split(', ');
 
-			const measuredAtHours = measuredAt.getHours();
+			const measuredAtHours = dayjs(measuredAt).hour();
+			console.log('hour', measuredAtHours);
 			const category =
 				measuredAtHours < 12
 					? 'breakfast'
@@ -79,7 +82,8 @@ export async function persistNutritionFitData(
 					? 'snack'
 					: measuredAtHours < 22
 					? 'dinner'
-					: 'midnight snack';
+					: 'other';
+
 			const measuredFormat = toStartOfDay(measuredAt);
 			const data = {
 				name,
