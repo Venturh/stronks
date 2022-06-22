@@ -58,7 +58,7 @@ export async function persistNutritionFitData(
 	return await Promise.all(
 		point.flatMap(async ({ value, startTimeNanos }) => {
 			const objectId = makeApiUuid([startTimeNanos.toString()]);
-			const measuredAt = dayjs.utc(startTimeNanos / 1000000).toDate();
+			const measuredAt = dayjs(startTimeNanos / 1000000).toDate();
 			let nutrition = value[0].mapVal!.reduce<Record<string, string | number>>((acc, curr) => {
 				acc[curr.key] = curr.value.fpVal!;
 				return acc;
@@ -71,16 +71,15 @@ export async function persistNutritionFitData(
 			};
 			const [name, amount] = value[2].stringVal!.split(', ');
 
-			const measuredAtHours = dayjs(measuredAt).hour();
-			console.log('hour', measuredAtHours, name);
+			const measuredAtHours = dayjs.utc(measuredAt).hour();
 			const category =
-				measuredAtHours < 12
+				measuredAtHours < 10
 					? 'breakfast'
-					: measuredAtHours < 15
+					: measuredAtHours < 13
 					? 'lunch'
-					: measuredAtHours < 18
+					: measuredAtHours < 16
 					? 'snack'
-					: measuredAtHours < 22
+					: measuredAtHours < 20
 					? 'dinner'
 					: 'other';
 
