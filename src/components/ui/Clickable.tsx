@@ -9,6 +9,7 @@ export interface ClickableProps extends Omit<ComponentProp, 'href'> {
 	ref?: any;
 	href?: Url | string;
 	as?: ElementType;
+	scroll?: boolean;
 }
 
 const Clickable = forwardRef<any, ClickableProps>(

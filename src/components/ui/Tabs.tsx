@@ -1,44 +1,93 @@
-import { cloneElement, ReactElement } from 'react';
 import clsx from 'clsx';
-import { Tab } from '@headlessui/react';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import Clickable from './Clickable';
 
 type Props = {
-	options: {
+	activeIndex?: number;
+	items: {
 		label: string;
-		slot: ReactElement;
+		href?: string;
+		onClick?: (index: number) => void;
+		scroll?: boolean;
 	}[];
 };
 
-const Slot = ({ type, ...rest }: { type: React.ReactElement }) => {
-	return cloneElement(type, { ...rest });
-};
+export default function Tabs({ activeIndex, items }: Props) {
+	const { asPath } = useRouter();
+	const [selected, setSelected] = useState(
+		activeIndex ?? items.findIndex((item) => item.href === asPath) ?? 0
+	);
 
-export default function Tabs({ options }: Props) {
+	useEffect(() => {
+		if (activeIndex) {
+			setSelected(activeIndex!);
+		}
+	}, [activeIndex]);
+	useEffect(() => {
+		if (asPath) {
+			items.findIndex((item) => item.href === asPath);
+		}
+	}, [asPath]);
+
+	const length = items.length;
+
+	const options = new Map([
+		[
+			2,
+			{
+				translate: {
+					'translate-x-0': selected === 0,
+					'translate-x-[100%]': selected === 1,
+				},
+				width: 'w-1/2',
+			},
+		],
+		[
+			3,
+			{
+				translate: {
+					'translate-x-0': selected === 0,
+					'translate-x-full': selected === 1,
+					'translate-x-[200%]': selected === 2,
+				},
+				width: 'w-1/3',
+			},
+		],
+	]);
+
+	const mappedOptions = options.get(length);
+
 	return (
-		<Tab.Group as="div">
-			<Tab.List className="flex p-1 space-x-1 rounded-xl ring-1 bg-secondary ring-accent-primary">
-				{options.map(({ label }) => (
-					<Tab
+		<nav className="relative max-w-xs overflow-x-scroll rounded-md ring-1 bg-secondary ring-accent-primary">
+			<div
+				className={clsx(
+					'absolute inset-y-0 h-full transition-transform transform',
+					mappedOptions?.width,
+					mappedOptions?.translate
+				)}
+			>
+				<div className={clsx('w-full h-full bg-accent-primary rounded-md')}></div>
+			</div>
+			<div className="relative flex w-full h-full">
+				{items.map(({ label, href, onClick, scroll }, index) => (
+					<Clickable
+						onClick={() => {
+							setSelected(index);
+							onClick && onClick(index);
+						}}
+						scroll={Boolean(scroll) || undefined}
 						key={label}
-						className={({ selected }) =>
-							clsx(
-								'py-1.5 w-full text-sm font-medium leading-5 rounded-lg md:py-2.5',
-								'focus:outline-none',
-								selected ? 'bg-accent-primary text-primary' : 'text-secondary hover:text-primary '
-							)
-						}
+						href={href}
+						className={clsx(
+							'py-1 w-1/3 text-center text-sm cursor-pointer select-none focus:outline-none capitalize font-medium',
+							mappedOptions?.width
+						)}
 					>
-						{label}
-					</Tab>
+						<span>{label}</span>
+					</Clickable>
 				))}
-			</Tab.List>
-			<Tab.Panels className="h-full mt-4 rounded-lg">
-				{options.map((option, idx) => (
-					<Tab.Panel className="h-full" key={idx}>
-						<Slot type={option.slot} />
-					</Tab.Panel>
-				))}
-			</Tab.Panels>
-		</Tab.Group>
+			</div>
+		</nav>
 	);
 }

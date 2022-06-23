@@ -75,12 +75,20 @@ export default function UserDropdown({ imageOnly }: Props) {
 					/>
 				) : (
 					<div className="w-full ">
-						<Button variant="ghost" position="left" className="w-full" rightIcon={<SelectorIcon />}>
+						<Button
+							variant="outline"
+							color="accent"
+							position="left"
+							className="w-full"
+							rightIcon={<SelectorIcon />}
+						>
 							<div className="text-left ">
-								<p className="text-sm truncate text-primary">{data.name}</p>
-								<p className="text-sm capitalize truncate text-secondary">
+								<span className="text-sm uppercase truncate text-primary">
+									{data.name?.slice(0, 2)}{' '}
+								</span>
+								<span className="text-sm capitalize truncate text-secondary">
 									{data.phase?.toLowerCase()}
-								</p>
+								</span>
 							</div>
 						</Button>
 					</div>

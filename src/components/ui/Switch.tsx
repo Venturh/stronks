@@ -28,7 +28,7 @@ export default function Switch({ checked, onChange, label, description }: Props)
 					</HSwitch.Description>
 				)}
 			</span>
-			<dd className="flex flex-1 mt-1 text-sm text-primary sm:mt-0 sm:col-span-1">
+			<dd className="flex justify-end flex-1 mt-1 text-sm text-primary sm:mt-0 sm:col-span-1">
 				<HSwitch
 					checked={checked}
 					onChange={onChange}

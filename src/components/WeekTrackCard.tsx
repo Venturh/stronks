@@ -1,15 +1,16 @@
 import clsx from 'clsx';
+import { ComponentProps } from 'react';
 import { pluralize } from 'utils/misc';
 
 type Props = {
 	days?: { active: boolean; weekDay: string }[];
 	primary?: number;
 	secondary?: string | React.ReactNode;
-};
+} & ComponentProps<'div'>;
 
-export default function WeekTrackCard({ days, primary, secondary }: Props) {
+export default function WeekTrackCard({ days, primary, secondary, ref }: Props) {
 	return (
-		<div className="my-4">
+		<div ref={ref} className="mb-4">
 			<div className="divide-y rounded-lg shadow divide-accent-primary bg-secondary">
 				<div className="w-full px-2 py-3 ">
 					<span className="text-sm font-medium">This Week</span>

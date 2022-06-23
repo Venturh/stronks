@@ -1,26 +1,30 @@
-import { useState } from 'react';
-import clsx from 'clsx';
+import { GetServerSidePropsContext } from 'next';
+import { useRouter } from 'next/router';
+import type { Measurements } from '@prisma/client';
 
 import AppLayout from 'components/layouts/AppLayout';
 import { StackedList, StackedListHeader, StackedListItem } from 'components/ui/StackedList';
+import WeekTrackCard from 'components/WeekTrackCard';
+import Tabs from 'components/ui/Tabs';
 
 import { trpc } from 'utils/trpc';
 import { authenticatedRoute } from 'utils/redirects';
 import { toCalendarDate } from 'utils/date';
 
-import type { Measurements } from '@prisma/client';
-import WeekTrackCard from 'components/WeekTrackCard';
-
 export default function Weights() {
+	const { query } = useRouter();
+	const type = query.type as 'weight' | 'bodyFat';
 	const { data } = trpc.useQuery(['measurements.index']);
 
-	const tabs: ['weight', 'bodyFat'] = ['weight', 'bodyFat'];
-	const [selectedTab, setSelectedTab] = useState<'weight' | 'bodyFat'>('weight');
+	const tabs = [
+		{ label: 'Weight', href: '/measurements/weight' },
+		{ label: 'Bodyfat', href: '/measurements/bodyFat' },
+	];
 
 	function getValue(measurments: Omit<Measurements, 'userId' | 'infoId'>[], idx: number) {
-		const current = measurments[idx][selectedTab];
-		const prev = measurments[idx + 1] ? measurments[idx + 1][selectedTab] : undefined;
-		const m = selectedTab === 'weight' ? 'kg' : '%';
+		const current = measurments[idx][type];
+		const prev = measurments[idx + 1] ? measurments[idx + 1][type] : undefined;
+		const m = type === 'weight' ? 'kg' : '%';
 		const secondary = toCalendarDate(measurments[idx].measuredFormat);
 
 		return {
@@ -36,31 +40,13 @@ export default function Weights() {
 	}
 
 	return (
-		<AppLayout title="Measurments" small>
+		<AppLayout title="Measurments" secondaryActions={<Tabs items={tabs} />} small>
 			<div>
 				<WeekTrackCard
 					days={data?.stats.days}
 					primary={data?.stats.primary}
 					secondary={data?.stats.secondary}
 				/>
-				<nav className="flex mb-2 space-x-8 rounded-xl ring-1 bg-secondary ring-accent-primary">
-					{tabs.map((tab) => (
-						<button
-							className={clsx(
-								selectedTab === tab
-									? 'bg-accent-primary text-primary'
-									: 'text-secondary hover:text-primary ',
-								'py-1.5 w-full text-sm font-medium leading-5 rounded-lg md:py-2',
-								'focus:outline-none'
-							)}
-							type="button"
-							key={tab}
-							onClick={() => setSelectedTab(tab)}
-						>
-							<span className="capitalize">{tab}</span>
-						</button>
-					))}
-				</nav>
 			</div>
 
 			<StackedList grouped>
@@ -68,9 +54,8 @@ export default function Weights() {
 					const secondary = `${new Intl.NumberFormat('en-US', {
 						signDisplay: 'exceptZero',
 					}).format(
-						(measurments[0][selectedTab] ?? 0) -
-							(measurments[measurments.length - 1][selectedTab] ?? 0)
-					)} ${selectedTab === 'bodyFat' ? '%' : 'kg'}`;
+						(measurments[0][type] ?? 0) - (measurments[measurments.length - 1][type] ?? 0)
+					)} ${type === 'bodyFat' ? '%' : 'kg'}`;
 					return (
 						<StackedListHeader key={month} primary={month} seconary={secondary}>
 							{measurments.map((measurment, idx) => {
@@ -93,4 +78,6 @@ export default function Weights() {
 	);
 }
 
-export const getServerSideProps = authenticatedRoute;
+export function getServerSideProps(ctx: GetServerSidePropsContext) {
+	return authenticatedRoute(ctx, 'type', ['weight', 'bodyFat']);
+}

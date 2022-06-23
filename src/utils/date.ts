@@ -29,5 +29,13 @@ export function getMonth(d: any) {
 	const month = dayjs(d.measuredFormat).format('MMMM');
 	const currentMonth = dayjs().format('MMMM');
 	const lastMonth = dayjs().subtract(1, 'month').format('MMMM');
-	return month === currentMonth ? 'Current Month' : month === lastMonth ? 'Last Month' : month;
+	return month === currentMonth ? 'current' : month === lastMonth ? 'last' : month;
+}
+
+export function toNormalDate(to?: Date) {
+	if (!to) return '';
+	return dayjs(to).utc().format('DD.MM.YY');
+}
+export function toNormalDateTime(to: Date) {
+	return dayjs(to).utc().format('DD.MM.YY, HH:mm');
 }

@@ -16,7 +16,7 @@ export default function DescriptionList({ title, description, action, children }
 					<p className="max-w-2xl text-sm text-secondary">{description}</p>
 				</div>
 				{action && (
-					<Button loading={action!.loading} onClick={() => action.onClick()}>
+					<Button className="ml-2" loading={action!.loading} onClick={() => action.onClick()}>
 						{action?.label}
 					</Button>
 				)}
