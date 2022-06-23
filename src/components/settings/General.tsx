@@ -1,4 +1,3 @@
-import DatePicker from 'components/ui/DatePicker';
 import DescriptionList from 'components/ui/DescripitonList';
 import Form from 'components/ui/Form';
 import ThemeSwitch from 'components/ui/ThemeToggle';
@@ -18,7 +17,7 @@ export default function GeneralSettings() {
 				<ThemeSwitch />
 				<Form form={form} headless>
 					<div className="grid gap-4 sm:grid-cols-2">
-						<DatePicker
+						{/* <DatePicker
 							range
 							label="Start"
 							{...(form.register('dateRange'),
@@ -29,7 +28,7 @@ export default function GeneralSettings() {
 									form.setValue('dateRange', val as any);
 								},
 							})}
-						/>
+						/> */}
 					</div>
 				</Form>
 			</div>
