@@ -15,7 +15,7 @@ export const nutritionRouter = createRouter()
 				(await db.$queryRaw`SELECT "measuredFormat","category",SUM("calories")as calories,string_agg("name",', ')as foodnames FROM "Nutrition" WHERE "userId"=${user?.id} GROUP BY"category","measuredFormat" ORDER BY"measuredFormat" DESC;
     `) as { measuredFormat: string; category: string; calories: number; foodnames: string }[];
 
-			const items = groupBy(data, (d) => getMonth(d.measuredFormat));
+			const items = groupBy(data, (d) => getMonth(d));
 
 			const stats = { primary: 0, secondary: 0 };
 

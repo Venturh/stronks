@@ -1,5 +1,4 @@
 import { Phase } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime';
 
 export type WithOutIdAndTimestamps<T> = Omit<T, 'id' | 'createdAt' | 'updatedAt'>;
 

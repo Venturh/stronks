@@ -1,45 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 
 import AppLayout from 'components/layouts/AppLayout';
 import { StackedList, StackedListHeader, StackedListItem } from 'components/ui/StackedList';
 import Tabs from 'components/ui/Tabs';
 import WeekTrackCard from 'components/WeekTrackCard';
 
+import useThingy from 'hooks/useThingy';
 import { toCalendarDate } from 'utils/date';
 import { toFixed, toHoursAndMinutes } from 'utils/misc';
 import { authenticatedRoute } from 'utils/redirects';
 import { trpc } from 'utils/trpc';
-import useIntersectionObserver from 'hooks/useIntersectionObserver';
 
 export default function Workouts() {
-	const dateRefs = useRef<HTMLDivElement[]>([]);
-	const startRef = useRef<null | HTMLDivElement>(null);
 	const { data } = trpc.useQuery(['workouts.index']);
 
-	const [selectedTab, setSelectedTab] = useState(0);
-
-	const tabs = [...new Set(Object.keys(data?.items ?? {}).map((key) => key))].map((month) => ({
-		label: month.toLowerCase(),
-		onClick: (index: number) => {
-			setSelectedTab(index);
-			dateRefs.current[index].scrollIntoView({
-				block: 'start',
-				inline: 'nearest',
-				behavior: 'smooth',
-			});
-		},
-	}));
-
-	const entry = useIntersectionObserver(dateRefs, {
-		// rootMargin: '200px 0px 0px 0px',
-		threshold: [0.4],
-	});
-
-	useEffect(() => {
-		if (entry?.isIntersecting) {
-			setSelectedTab(tabs.findIndex((tab) => tab.label === entry.target.id));
-		}
-	}, [entry]);
+	const { dateRefs, tabs, selectedTab } = useThingy(data?.items);
 
 	return (
 		<AppLayout
@@ -47,7 +22,8 @@ export default function Workouts() {
 			secondaryActions={<Tabs activeIndex={selectedTab} items={tabs} />}
 			small
 		>
-			<div ref={startRef}>
+			{/* @ts-expect-error yep */}
+			<div ref={(el) => (dateRefs.current[0] = el)}>
 				<WeekTrackCard
 					days={data?.stats.days}
 					primary={data?.stats.primary}

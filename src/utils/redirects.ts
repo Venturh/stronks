@@ -1,7 +1,7 @@
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { getSession, getCsrfToken } from 'next-auth/react';
 
-export async function unauthenticatedRoute(ctx: GetServerSidePropsContext, redirect = '/') {
+export async function unauthenticatedRoute(ctx: GetServerSidePropsContext, redirect = '/overview') {
 	const session = await getSession(ctx);
 	const csrfToken = await getCsrfToken(ctx);
 

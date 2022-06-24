@@ -33,7 +33,7 @@ export function StackedListHeader({
 	...rest
 }: StackedListHeaderProps) {
 	return (
-		<div className="min-h-[24rem]" {...rest}>
+		<div className="" {...rest}>
 			<div className="sticky top-0 z-10 px-2 py-4 font-medium text-secondary ">
 				<div className="flex justify-between ">
 					<span className="capitalize">{primary} </span>

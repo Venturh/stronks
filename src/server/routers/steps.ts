@@ -13,7 +13,7 @@ export const stepsRouter = createRouter().query('index', {
 			where: { userId: user?.id },
 			orderBy: { measuredFormat: 'desc' },
 		});
-		const items = groupBy(steps, (s) => getMonth(s.measuredFormat));
+		const items = groupBy(steps, (s) => getMonth(s));
 
 		const stats = { primary: 0, secondary: 0 };
 

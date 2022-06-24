@@ -37,7 +37,6 @@ export async function getAggregatedData(
 ) {
 	const startTime = dayjs().subtract(2, 'months').startOf('day').unix() * 1000;
 	const endTime = dayjs().subtract(0, 'days').endOf('day').unix() * 1000;
-	console.log(startTime, endTime);
 	const { data }: AxiosResponse<AggregatedDataSourceResponse> = await axios.post(
 		'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',
 		{

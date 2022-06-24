@@ -10,16 +10,19 @@ import Tabs from 'components/ui/Tabs';
 import { trpc } from 'utils/trpc';
 import { authenticatedRoute } from 'utils/redirects';
 import { toCalendarDate } from 'utils/date';
+import useThingy from 'hooks/useThingy';
 
 export default function Weights() {
 	const { query } = useRouter();
 	const type = query.type as 'weight' | 'bodyFat';
 	const { data } = trpc.useQuery(['measurements.index']);
 
-	const tabs = [
+	const typeTabs = [
 		{ label: 'Weight', href: '/measurements/weight' },
 		{ label: 'Bodyfat', href: '/measurements/bodyFat' },
 	];
+
+	const { dateRefs, tabs, selectedTab } = useThingy(data?.items);
 
 	function getValue(measurments: Omit<Measurements, 'userId' | 'infoId'>[], idx: number) {
 		const current = measurments[idx][type];
@@ -40,8 +43,14 @@ export default function Weights() {
 	}
 
 	return (
-		<AppLayout title="Measurments" secondaryActions={<Tabs items={tabs} />} small>
-			<div>
+		<AppLayout
+			title="Measurments"
+			actions={<Tabs items={typeTabs} maxWidth="max-w-[120px] md:max-w-[180px]" />}
+			secondaryActions={<Tabs activeIndex={selectedTab} items={tabs} />}
+			small
+		>
+			{/* @ts-expect-error yep */}
+			<div ref={(el) => (dateRefs.current[0] = el)}>
 				<WeekTrackCard
 					days={data?.stats.days}
 					primary={data?.stats.primary}
@@ -50,27 +59,35 @@ export default function Weights() {
 			</div>
 
 			<StackedList grouped>
-				{Object.entries(data?.items ?? {})?.map(([month, measurments]) => {
+				{Object.entries(data?.items ?? {})?.map(([month, measurments], i) => {
 					const secondary = `${new Intl.NumberFormat('en-US', {
 						signDisplay: 'exceptZero',
 					}).format(
 						(measurments[0][type] ?? 0) - (measurments[measurments.length - 1][type] ?? 0)
 					)} ${type === 'bodyFat' ? '%' : 'kg'}`;
 					return (
-						<StackedListHeader key={month} primary={month} seconary={secondary}>
-							{measurments.map((measurment, idx) => {
-								const { primary, secondary, tertiary } = getValue(measurments, idx);
+						<div
+							id={month.toLowerCase()}
+							style={{ scrollMarginTop: month === 'current' ? '800px' : '100px' }}
+							//@ts-expect-error yep
+							ref={(el) => (dateRefs.current[i] = el)}
+							key={month}
+						>
+							<StackedListHeader primary={month} seconary={secondary}>
+								{measurments.map((measurment, idx) => {
+									const { primary, secondary, tertiary } = getValue(measurments, idx);
 
-								return (
-									<StackedListItem
-										key={measurment.id}
-										primary={primary}
-										secondary={secondary}
-										tertiary={tertiary}
-									/>
-								);
-							})}
-						</StackedListHeader>
+									return (
+										<StackedListItem
+											key={measurment.id}
+											primary={primary}
+											secondary={secondary}
+											tertiary={tertiary}
+										/>
+									);
+								})}
+							</StackedListHeader>
+						</div>
 					);
 				})}
 			</StackedList>

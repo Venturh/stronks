@@ -1,4 +1,5 @@
 import LandingLayout from 'components/layouts/LandingLayout';
+import { unauthenticatedRoute } from 'utils/redirects';
 
 export default function Landing() {
 	const title = 'Tizzl';
@@ -9,3 +10,5 @@ export default function Landing() {
 		</LandingLayout>
 	);
 }
+
+export const getServerSideProps = unauthenticatedRoute;

@@ -20,8 +20,6 @@ export default function General() {
 	const { query } = useRouter();
 	const setting = query.setting as 'sync' | 'general';
 
-	console.log(pages[setting], setting);
-
 	return (
 		<AppLayout title="Settings" secondaryActions={<Tabs items={tabs} />} small>
 			{createElement(pages[setting])}
