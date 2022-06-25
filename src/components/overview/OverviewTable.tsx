@@ -10,17 +10,18 @@ import {
 import { Phase } from '@prisma/client';
 import { ItemInterface, ReactSortable } from 'react-sortablejs';
 
-import Select from './ui/Select';
-import Checkbox from './ui/Checkbox';
-import NestedMenu from './ui/NestedMenu';
+import Select from 'components/ui/Select';
+import Checkbox from 'components/ui/Checkbox';
+import NestedMenu from 'components/ui/NestedMenu';
 
 import { trpc } from 'utils/trpc';
-import type { Color } from './ui/Button';
+import type { Color } from '../ui/Button';
 import { OverviewData } from 'types';
 import { DotsHorizontalIcon, EyeIcon, MenuIcon } from '@heroicons/react/solid';
-import IconButton from './ui/IconButton';
-import SlideOver from './ui/SlideOver';
+import IconButton from '../ui/IconButton';
+import SlideOver from '../ui/SlideOver';
 import clsx from 'clsx';
+import OverviewEditModal from './OverviewEditModal';
 
 type Props = {
 	items: OverviewData[];
@@ -30,6 +31,24 @@ type Props = {
 const table = createTable().setRowType<OverviewData>();
 
 const defaultColumns = [
+	table.createDisplayColumn({
+		id: 'toggle',
+		cell: ({ row }) => (
+			<Checkbox
+				color="secondary"
+				checked={row.getIsSelected()}
+				onChange={row.getToggleSelectedHandler()}
+			/>
+		),
+		header: ({ instance }) => (
+			<Checkbox
+				color="secondary"
+				checked={instance.getIsAllRowsSelected()}
+				onChange={instance.getToggleAllRowsSelectedHandler()}
+			/>
+		),
+		enableSorting: false,
+	}),
 	table.createDataColumn('date', {
 		cell: (info) => info.getValue(),
 	}),
@@ -71,7 +90,10 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 	const [data] = React.useState(() => [...items]);
 	const [columns] = React.useState<typeof defaultColumns>(() => [...defaultColumns]);
 	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(initialVisibility);
-	const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(orderOverviewColumns);
+	const [columnOrder, setColumnOrder] = useState<ColumnOrderState>([
+		'toggle',
+		...orderOverviewColumns,
+	]);
 	const [columnVisibilityList, setColumnVisibilityList] = useState<ItemInterface[]>(
 		Object.entries(columnVisibility).map(([id, visible]) => ({ id, visible }))
 	);
@@ -80,13 +102,16 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 
 	const editUser = trpc.useMutation('user.edit');
 
+	const [rowSelection, setRowSelection] = useState({});
 	const instance = useTableInstance(table, {
 		data,
 		columns,
 		state: {
+			rowSelection,
 			columnVisibility,
 			columnOrder,
 		},
+		onRowSelectionChange: setRowSelection,
 		onColumnVisibilityChange: setColumnVisibility,
 		getCoreRowModel: getCoreRowModel(),
 	});
@@ -119,36 +144,48 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 	}
 
 	return (
-		<div>
+		<>
 			<table className="relative min-w-full overflow-x-scroll divide-y shadow table-fixed divide-accent-primary ring-1 bg-secondary ring-accent-primary md:rounded-lg">
 				<thead>
 					{instance.getHeaderGroups().map((headerGroup) => (
 						<tr key={headerGroup.id}>
-							{headerGroup.headers.map((header) => (
+							{headerGroup.headers.map((header, i) => (
 								<th
-									className="font-medium tracking-wider text-left uppercase text-primary"
+									className={clsx('font-medium tracking-wider text-left uppercase text-primary', {
+										'relative w-12 px-6 sm:w-16 sm:px-8': header.id === 'toggle',
+										'min-w-[8rem]': i === 1,
+									})}
 									key={header.id}
 									colSpan={header.colSpan}
 								>
-									<NestedMenu
-										className="py-4 px-1.5 font-medium tracking-wider text-left uppercase text-xxs text-primary"
-										menuItems={[
-											{
-												items: [
-													{
-														text: 'Hide column',
-														icon: <EyeOffIcon />,
-														action: async () => {
-															header.column.toggleVisibility(false);
-															await editColumVisibility(header.column.id, false);
+									{header.id !== 'toggle' ? (
+										<NestedMenu
+											className={clsx(
+												'py-4 px-1.5 font-medium tracking-wider text-left uppercase text-xxs text-primary',
+												{
+													'min-w-[8rem]': i === 1,
+												}
+											)}
+											menuItems={[
+												{
+													items: [
+														{
+															text: 'Hide column',
+															icon: <EyeOffIcon />,
+															action: async () => {
+																header.column.toggleVisibility(false);
+																await editColumVisibility(header.column.id, false);
+															},
 														},
-													},
-												],
-											},
-										]}
-									>
+													],
+												},
+											]}
+										>
+											<span>{header.isPlaceholder ? null : header.renderHeader()}</span>
+										</NestedMenu>
+									) : (
 										<span>{header.isPlaceholder ? null : header.renderHeader()}</span>
-									</NestedMenu>
+									)}
 								</th>
 							))}
 							<th className="py-4 px-1.5 font-medium tracking-wider text-left uppercase text-xxs text-primary">
@@ -168,8 +205,14 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 				<tbody className="relative divide-y divide-accent-primary">
 					{instance.getRowModel().rows.map((row) => (
 						<tr key={row.id}>
-							{row.getVisibleCells().map((cell) => (
-								<td className="px-2 py-3 text-sm text-left w-28 whitespace-nowrap" key={cell.id}>
+							{row.getVisibleCells().map((cell, index) => (
+								<td
+									className={clsx(
+										'px-2 py-3 text-sm text-left  whitespace-nowrap',
+										index === 0 ? 'relative w-12 px-6 sm:w-16 sm:px-8' : 'w-28'
+									)}
+									key={cell.id}
+								>
 									{cell.renderCell()}
 								</td>
 							))}
@@ -220,7 +263,11 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 					))}
 				</ReactSortable>
 			</SlideOver>
-		</div>
+			<OverviewEditModal
+				filterIds={instance.getSelectedRowModel().flatRows.flatMap(({ original }) => original!.id)}
+				onChange={() => setRowSelection([])}
+			/>
+		</>
 	);
 }
 
@@ -243,22 +290,20 @@ function PhaseCell({ row, getValue }: { row: any; getValue: () => any }) {
 	};
 
 	return (
-		<div className="block h-12 -my-4 w-28">
-			<Select
-				onChange={async (phase) => {
-					setValue(phase as Phase);
-					await update.mutateAsync({
-						phase: phase as Phase,
-						infoId,
-					});
-				}}
-				value={value}
-				items={items}
-				badge
-				variant="subtle"
-				color={colors[value]}
-			/>
-		</div>
+		<Select
+			onChange={async (phase) => {
+				setValue(phase as Phase);
+				await update.mutateAsync({
+					phase: phase as Phase,
+					infoId,
+				});
+			}}
+			value={value}
+			items={items}
+			badge
+			variant="subtle"
+			color={colors[value]}
+		/>
 	);
 }
 
@@ -304,6 +349,7 @@ function CheckboxCell({
 
 	return (
 		<Checkbox
+			color="secondary"
 			disabled={disabled}
 			checked={value}
 			onChecked={async (checked) => onChange(checked)}

@@ -16,18 +16,25 @@ type Props = {
 	onChange: (value: string) => void;
 };
 
-export default function Select({ value, onChange, items, badge, color, variant }: Props) {
+export default function Select({
+	value,
+	onChange,
+	items,
+	badge,
+	color = 'primary',
+	variant,
+}: Props) {
 	return (
 		<SelectPrimitive.Root value={value} onValueChange={onChange}>
-			<SelectPrimitive.Trigger className="w-full h-full" asChild aria-label="Select">
+			<SelectPrimitive.Trigger className="" asChild aria-label="Select">
 				{badge ? (
-					<button className="w-full h-full">
+					<button>
 						<Badge color={color} variant={variant}>
 							<SelectPrimitive.Value />
 						</Badge>
 					</button>
 				) : (
-					<Button size="sm" rightIcon={<ChevronDownIcon />}>
+					<Button size="sm" color={color} rightIcon={<ChevronDownIcon />}>
 						<SelectPrimitive.Value />
 					</Button>
 				)}

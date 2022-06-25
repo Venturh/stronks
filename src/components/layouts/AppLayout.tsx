@@ -32,7 +32,7 @@ export default function AppLayout({ children, title, small, actions, secondaryAc
 								<span className="sr-only">Open sidebar</span>
 								<MenuAlt2Icon className="w-6 h-6" aria-hidden="true" />
 							</button>
-							<div className="flex items-center justify-between w-full py-3 md:hidden ">
+							<div className="flex items-center justify-between w-full py-3 ml-3 md:hidden ">
 								{title && (
 									<div className="flex" style={{ flex: '0 0 auto' }}>
 										<span className="font-medium leading-7 text-primary">{title}</span>
@@ -68,8 +68,8 @@ export default function AppLayout({ children, title, small, actions, secondaryAc
 							</div>
 							<div
 								className={clsx(
-									{ 'max-w-4xl mx-auto': small },
-									'px-4 overflow-scroll mt-4 md:px-0'
+									'px-4 mx-auto overflow-x-scroll overflow-y-hidden mt-4 md:px-0',
+									small ? 'max-w-4xl ' : 'max-w-7xl'
 								)}
 							>
 								{children}

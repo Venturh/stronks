@@ -1,5 +1,5 @@
 import AppLayout from 'components/layouts/AppLayout';
-import OverviewTable from 'components/OverviewTable';
+import OverviewTable from 'components/overview/OverviewTable';
 import { authenticatedRoute } from 'utils/redirects';
 import { trpc } from 'utils/trpc';
 

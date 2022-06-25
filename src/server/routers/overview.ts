@@ -34,4 +34,18 @@ export const overviewRouter = createRouter()
 				data: { phase, notes, supplement: { update: { creatine } } },
 			});
 		},
+	})
+	.mutation('bulk-update', {
+		input: z.object({
+			infoIds: z.array(z.string()),
+			phase: z.nativeEnum(Phase),
+			creatine: z.boolean(),
+		}),
+		async resolve({ input: { phase, infoIds, creatine } }) {
+			await db.info.updateMany({
+				where: { id: { in: infoIds } },
+				data: { phase },
+			});
+			await db.supplements.updateMany({ where: { infoId: { in: infoIds } }, data: { creatine } });
+		},
 	});
