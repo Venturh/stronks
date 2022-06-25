@@ -192,7 +192,8 @@ async function createOrUpateInfo(measuredFormat: Date, userId: string) {
 	const info = await db.info.findFirst({ where: { measuredFormat, userId } });
 	if (info) return info.id;
 	else {
-		const newInfo = await db.info.create({ data: { measuredFormat, userId } });
+		const user = await db.user.findUnique({ where: { id: userId } });
+		const newInfo = await db.info.create({ data: { measuredFormat, userId, phase: user?.phase } });
 		await db.supplements.create({
 			data: { infoId: newInfo.id, measuredFormat, userId },
 		});

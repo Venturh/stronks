@@ -82,18 +82,21 @@ const defaultColumns = [
 ];
 
 export default function OverviewTable({ items, hiddenTableHeaders, orderOverviewColumns }: Props) {
-	const initialVisibility = orderOverviewColumns.reduce<Record<string, any>>((acc, curr) => {
-		acc[curr] = hiddenTableHeaders.includes(curr) ? false : true;
-		return acc;
-	}, {});
+	const orderOverviewColumnsWithCheckbox = ['toggle', ...orderOverviewColumns];
+	const initialVisibility = orderOverviewColumnsWithCheckbox.reduce<Record<string, any>>(
+		(acc, curr) => {
+			acc[curr] = hiddenTableHeaders.includes(curr) ? false : true;
+			return acc;
+		},
+		{}
+	);
 
 	const [data] = React.useState(() => [...items]);
 	const [columns] = React.useState<typeof defaultColumns>(() => [...defaultColumns]);
 	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(initialVisibility);
-	const [columnOrder, setColumnOrder] = useState<ColumnOrderState>([
-		'toggle',
-		...orderOverviewColumns,
-	]);
+	const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
+		orderOverviewColumnsWithCheckbox
+	);
 	const [columnVisibilityList, setColumnVisibilityList] = useState<ItemInterface[]>(
 		Object.entries(columnVisibility).map(([id, visible]) => ({ id, visible }))
 	);
@@ -226,41 +229,43 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 					animation={200}
 					delay={1}
 					swap
-					list={columnVisibilityList}
+					list={columnVisibilityList.filter((c) => c.id !== 'toggle')}
 					setList={async (list, sortable, store) => {
 						if (
 							store.dragging &&
 							store.dragging.props &&
 							JSON.stringify(store.dragging.props.list) !== JSON.stringify(list)
 						) {
-							await editColumnOrder(list);
+							await editColumnOrder([columnVisibilityList[0], ...list]);
 						}
 					}}
 				>
-					{columnVisibilityList.map(({ id, visible }) => (
-						<div key={id} className="cursor-default bg-secondary hover:bg-accent-secondary">
-							<div className="w-full px-4 py-2 ">
-								<div className="flex justify-between">
-									<div className="flex items-center ">
-										<MenuIcon className="w-3.5 h-3.5 text-secondary" />
-										<span className="ml-1 text-sm capitalize">{id}</span>
+					{columnVisibilityList
+						.filter((c) => c.id !== 'toggle')
+						.map(({ id, visible }) => (
+							<div key={id} className="cursor-default bg-secondary hover:bg-accent-secondary">
+								<div className="w-full px-4 py-2 ">
+									<div className="flex justify-between">
+										<div className="flex items-center ">
+											<MenuIcon className="w-3.5 h-3.5 text-secondary" />
+											<span className="ml-1 text-sm capitalize">{id}</span>
+										</div>
+										<IconButton
+											onClick={async () => {
+												await editColumVisibility(id as string, !visible);
+												instance.getColumn(id as string).toggleVisibility(!visible);
+											}}
+											className={clsx({ 'opacity-50': !visible })}
+											size="xs"
+											variant="ghost"
+											color="primary"
+											icon={<EyeIcon />}
+											ariaLabel="show"
+										/>
 									</div>
-									<IconButton
-										onClick={async () => {
-											await editColumVisibility(id as string, !visible);
-											instance.getColumn(id as string).toggleVisibility(!visible);
-										}}
-										className={clsx({ 'opacity-50': !visible })}
-										size="xs"
-										variant="ghost"
-										color="primary"
-										icon={<EyeIcon />}
-										ariaLabel="show"
-									/>
 								</div>
 							</div>
-						</div>
-					))}
+						))}
 				</ReactSortable>
 			</SlideOver>
 			<OverviewEditModal
