@@ -126,6 +126,7 @@ model Nutrition {
     category           String?
     measuredFormat     DateTime
     measuredAt         DateTime
+    synced              Boolean  @default(false)
     infoId             String?
     Info               Info?    @relation(fields: [infoId], references: [id])
     userId             String

@@ -194,9 +194,7 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 							<th className="py-4 px-1.5 font-medium tracking-wider text-left uppercase text-xxs text-primary">
 								<IconButton
 									onClick={() => setOpen(!open)}
-									color="primary"
 									size="xs"
-									variant="ghost"
 									fullRounded
 									icon={<DotsHorizontalIcon />}
 									ariaLabel="settings"

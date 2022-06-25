@@ -1,17 +1,23 @@
+import { useState } from 'react';
+import { groupBy, sumBy } from 'lodash';
+import dayjs from 'dayjs';
+
 import AppLayout from 'components/layouts/AppLayout';
+import NutritionComposer from 'components/nutrition/NutritionComposer';
+import Button from 'components/ui/Button';
 import { StackedList, StackedListHeader, StackedListItem } from 'components/ui/StackedList';
 import Tabs from 'components/ui/Tabs';
 import WeekTrackCard from 'components/WeekTrackCard';
-import dayjs from 'dayjs';
-import useThingy from 'hooks/useThingy';
-import { groupBy, sumBy } from 'lodash';
 
+import useThingy from 'hooks/useThingy';
 import { toCalendarDate } from 'utils/date';
 import { authenticatedRoute } from 'utils/redirects';
 import { trpc } from 'utils/trpc';
 
 export default function Home() {
 	const { data } = trpc.useQuery(['nutrition.index']);
+
+	const [showStoreModal, setShowStoreModal] = useState(false);
 
 	const { dateRefs, tabs, selectedTab } = useThingy(data?.items);
 
@@ -25,9 +31,11 @@ export default function Home() {
 	return (
 		<AppLayout
 			title="Nutrition"
+			actions={<Button onClick={() => setShowStoreModal(true)}>Add</Button>}
 			secondaryActions={<Tabs activeIndex={selectedTab} items={tabs} />}
 			small
 		>
+			<NutritionComposer open={showStoreModal} close={() => setShowStoreModal(false)} />
 			{/* @ts-expect-error yep */}
 			<div ref={(el) => (dateRefs.current[0] = el)}>
 				<WeekTrackCard
@@ -76,31 +84,6 @@ export default function Home() {
 					);
 				})}
 			</StackedList>
-			{/* {data && (
-				<StackedList grouped>
-					{Object.entries(data).map(([date, items]) => {
-						return (
-							<StackedListHeader key={date} primary={toCalendarDate(date)}>
-								{items
-									.sort((a, b) => priority[b.category] - priority[a.category])
-									.map(({ calories, foodnames, category }, i) => {
-										return (
-											<StackedListItem
-												href={`/nutrition/show?category=${category}&date=${dayjs(
-													date
-												).toISOString()}`}
-												key={i}
-												primary={foodnames}
-												secondary={category}
-												tertiary={`${calories} kcal`}
-											/>
-										);
-									})}
-							</StackedListHeader>
-						);
-					})}
-				</StackedList>
-			)} */}
 		</AppLayout>
 	);
 }

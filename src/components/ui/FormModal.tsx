@@ -5,6 +5,7 @@ import { FieldValues } from 'react-hook-form';
 import Button from './Button';
 import Form, { FormProps } from './Form';
 import Modal, { ModalProps } from './Modal';
+import { Error } from './Input';
 
 interface Test<T extends FieldValues> extends FormProps<T> {
 	title: string;
@@ -97,7 +98,16 @@ export default function FormModal<T extends FieldValues>({
 				}
 				{...rest}
 			>
-				<div>{children}</div>
+				<div>
+					{children}
+					{Object.keys(form.formState.errors).length > 0 && (
+						<div className="max-h-[128px] mt-4 ring-1 rounded ring-accent-primary p-2 overflow-y-scroll">
+							{Object.keys(form.formState.errors).map((key) => (
+								<Error withName name={key} key={key} />
+							))}
+						</div>
+					)}
+				</div>
 			</Modal>
 		</Form>
 	);

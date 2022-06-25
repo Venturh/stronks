@@ -1,1 +1,2 @@
-# NextJs - Prisma - tRPC - Auth
+# Stronks
+Health Companion - Work in Progress

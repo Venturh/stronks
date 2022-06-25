@@ -9,6 +9,7 @@ type SelectItem = { label: string; value: string; disabled?: boolean };
 
 type Props = {
 	value: string;
+	label?: string;
 	items: SelectItem[];
 	badge?: boolean;
 	color?: Color;
@@ -18,6 +19,7 @@ type Props = {
 
 export default function Select({
 	value,
+	label,
 	onChange,
 	items,
 	badge,
@@ -34,7 +36,7 @@ export default function Select({
 						</Badge>
 					</button>
 				) : (
-					<Button size="sm" color={color} rightIcon={<ChevronDownIcon />}>
+					<Button label={label} size="sm" color={color} rightIcon={<ChevronDownIcon />}>
 						<SelectPrimitive.Value />
 					</Button>
 				)}

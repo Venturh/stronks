@@ -42,8 +42,6 @@ export default function SlideOver({ children, open, onClose, title }: Props) {
 														onClick={onClose}
 														icon={<XIcon />}
 														ariaLabel="close"
-														color="secondary"
-														variant="ghost"
 														fullRounded
 													/>
 												</div>

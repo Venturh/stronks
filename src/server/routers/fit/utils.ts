@@ -8,6 +8,8 @@ import { getAggregatedData, getDatasetData } from './api';
 
 import { toStartOfDay } from 'utils/date';
 import { activityTypeMapping } from './types';
+import { Nutrition } from '@prisma/client';
+import { WithOutIdAndTimestamps } from 'types';
 
 export async function persistMeasurementsFitData(userId: string, accessToken: string) {
 	const { bucket } = await getAggregatedData(accessToken, [
@@ -92,6 +94,7 @@ export async function persistNutritionFitData(
 				category,
 				userId,
 				objectId,
+				synced: true,
 				infoId: await createOrUpateInfo(measuredFormat, userId),
 				originDataSourceId: dataSourceId,
 				...nutrition,
@@ -188,6 +191,32 @@ export async function persistActivityStepsData(accessToken: string, userId: stri
 	});
 }
 
+export async function createNutrition(
+	{
+		userId,
+		...nutrition
+	}: Omit<
+		WithOutIdAndTimestamps<Nutrition>,
+		'measuredAt' | 'measuredFormat' | 'objectId' | 'originDataSourceId' | 'infoId'
+	>,
+	date: string
+) {
+	const measuredAt = dayjs(date).toDate();
+	const measuredFormat = toStartOfDay(measuredAt);
+	const objectId = makeApiUuid([measuredAt.toString(), userId, Math.random().toString()]);
+
+	return db.nutrition.create({
+		data: {
+			...nutrition,
+			measuredAt,
+			measuredFormat,
+			objectId,
+			userId,
+			infoId: await createOrUpateInfo(measuredFormat, userId),
+		},
+	});
+}
+
 async function createOrUpateInfo(measuredFormat: Date, userId: string) {
 	const info = await db.info.findFirst({ where: { measuredFormat, userId } });
 	if (info) return info.id;
@@ -201,6 +230,6 @@ async function createOrUpateInfo(measuredFormat: Date, userId: string) {
 	}
 }
 
-function makeApiUuid(keys: string[]) {
+export function makeApiUuid(keys: string[]) {
 	return uuidByString(keys.join('-'));
 }

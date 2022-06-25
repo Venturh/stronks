@@ -125,14 +125,14 @@ export function ButtonIcon({ children, className, ...rest }: ComponentProps<'spa
 }
 
 const sizes = {
-	xxs: 'p-1 text-xs',
+	xxs: 'p-1.5 text-xxs',
 	xs: 'px-1.5 py-1 text-xs ',
 	sm: 'px-3 py-1 text-sm',
 	md: 'px-4 py-1.5 text-sm',
 	lg: 'px-4 py-2 text-base',
 };
 const sizesCircle = {
-	xxs: '',
+	xxs: 'p-0.5 text-xxs rounded-full',
 	xs: 'p-1 text-sm rounded-full',
 	sm: 'p-1.5 text-sm rounded-full',
 	md: 'p-2 text-sm rounded-full',
@@ -153,7 +153,7 @@ export const solid = {
 	primary:
 		'text-white dark:text-black bg-text-primary hover:bg-text-secondary shadow-sm focus:ring-1 focus:ring-accent-primary ring-offset-2 ring-offset-bg-primary disabled:hover:bg-text-primary',
 	secondary:
-		'text-primary bg-bg-secondary hover:bg-accent-secondary shadow-sm focus:ring-1 focus:ring-accent-primary ring-offset-2 ring-offset-bg-primary disabled:hover:bg-bg-secondary',
+		'text-primary bg-bg-secondary border border-accent-primary hover:bg-accent-secondary shadow-sm focus:ring-1 focus:ring-accent-primary ring-offset-2 ring-offset-bg-primary disabled:hover:bg-bg-secondary',
 };
 
 export const outline = {

@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { ComponentProps, ReactChild } from 'react';
+import { ComponentProps, ReactChild, ReactNode } from 'react';
 import Clickable from './Clickable';
 import EmptyState from './EmptyState';
 
@@ -49,7 +49,7 @@ type StackedListItemProps = ComponentProps<'li'> & {
 	primary: string;
 	secondary?: string;
 	tertiary?: string;
-	quaternary?: string;
+	quaternary?: string | ReactNode;
 	href?: string;
 };
 

@@ -12,7 +12,7 @@ interface IconButtonsProps extends Omit<ButtonProps, OmittedProps> {
 }
 
 export const iconSizes = {
-	xxs: 'h-3 w-3',
+	xxs: 'h-2.5 w-2.5',
 	xs: 'h-3.5 w-3.5',
 	sm: 'h-4 w-4',
 	md: 'h-5 w-5',
@@ -29,6 +29,8 @@ const IconButton = forwardRef<any, IconButtonsProps>(
 			children,
 			fullRounded = false,
 			loading,
+			color = 'secondary',
+			variant = 'ghost',
 			...rest
 		}: IconButtonsProps,
 		_
@@ -41,7 +43,14 @@ const IconButton = forwardRef<any, IconButtonsProps>(
 			  })
 			: null;
 		return (
-			<Button circle={fullRounded} loading={loading} size={size} {...rest}>
+			<Button
+				circle={fullRounded}
+				loading={loading}
+				size={size}
+				color={color}
+				variant={variant}
+				{...rest}
+			>
 				<span className="sr-only">{ariaLabel}</span>
 				{!loading && (
 					<ButtonIcon className={clsx('text-currentColor ', iconSizes[size])}>

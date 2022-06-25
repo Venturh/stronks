@@ -1,12 +1,14 @@
 import { z } from 'zod';
 import dayjs from 'dayjs';
 import { groupBy, sumBy } from 'lodash';
-import { createRouter } from 'server/createRouter';
 
+import { createRouter } from 'server/createRouter';
 import { db } from 'lib/prisma';
 import { getMonth, toStartOfDay } from 'utils/date';
 import { generateWeekyDayTrack } from 'server/utils/misc';
 import { toFixed } from 'utils/misc';
+import { createNutrition } from './fit/utils';
+import { createNutritionSchema } from 'components/nutrition/NutritionComposer';
 
 export const nutritionRouter = createRouter()
 	.query('index', {
@@ -52,5 +54,17 @@ export const nutritionRouter = createRouter()
 		async resolve({ input }) {
 			const { category, measuredFormat } = input;
 			return db.nutrition.findMany({ where: { category, measuredFormat } });
+		},
+	})
+	.mutation('store', {
+		input: createNutritionSchema,
+		async resolve({ input: { date, ...rest }, ctx: { user } }) {
+			return await createNutrition({ userId: user!.id, synced: false, ...rest }, date);
+		},
+	})
+	.mutation('destroy', {
+		input: z.object({ id: z.string() }),
+		async resolve({ input: { id } }) {
+			return await db.nutrition.delete({ where: { id } });
 		},
 	});

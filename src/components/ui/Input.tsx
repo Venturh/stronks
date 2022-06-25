@@ -8,9 +8,19 @@ interface Props extends ComponentProps<'input'> {
 	trailingText?: string;
 	leadingText?: string;
 	as?: 'input' | 'textarea';
+	withError?: boolean;
+	valueAsNumber?: boolean;
 }
 
-export function Error({ name, padding }: { name?: string; padding?: boolean }) {
+export function Error({
+	name,
+	padding,
+	withName,
+}: {
+	name?: string;
+	padding?: boolean;
+	withName?: boolean;
+}) {
 	const {
 		formState: { errors },
 	} = useFormContext();
@@ -24,7 +34,8 @@ export function Error({ name, padding }: { name?: string; padding?: boolean }) {
 					'py-2 px-4': padding,
 				})}
 			>
-				{error.message}
+				{withName && <span className="capitalize">{name}: </span>}
+				<span> {error.message}</span>
 			</div>
 		);
 	} else return null;
@@ -32,15 +43,26 @@ export function Error({ name, padding }: { name?: string; padding?: boolean }) {
 
 export const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>(
 	(
-		{ label, type = 'text', trailingText, leadingText, inset = true, as = 'input', ...rest },
+		{
+			label,
+			trailingText,
+			leadingText,
+			inset = true,
+			as = 'input',
+			className,
+			withError = false,
+			type = 'text',
+			valueAsNumber,
+			...rest
+		},
 		ref
 	) => {
 		const Tag = as;
 		const wrapperClass =
-			'w-full px-4 py-2 rounded-lg disabled:bg-opacity-20 focus-within:border-brand-primary focus-within:ring-brand-primary disabled:opacity-60 disabled:bg-accent-primary border border-accent-primary border bg-secondary text-primary';
+			'w-full px-4 py-1 rounded-lg disabled:bg-opacity-20 focus-within:border-brand-primary focus:ring-none focus:border-none disabled:opacity-60 disabled:bg-accent-primary border border-accent-primary border bg-secondary text-primary';
 
 		return (
-			<div className={inset ? wrapperClass : undefined}>
+			<div className={clsx(inset ? wrapperClass : undefined, className)}>
 				{label && (
 					<label htmlFor={rest.name} className="block text-xs font-medium text-secondary">
 						{label}
@@ -55,7 +77,7 @@ export const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>(
 					<Tag
 						className={clsx(
 							inset
-								? 'resize-none block p-0 w-full border-0 focus:ring-0 sm:text-sm bg-secondary placeholder-accent-primary'
+								? 'h-full resize-none block p-0 w-full border-0 focus:ring-0 sm:text-sm bg-secondary placeholder-accent-primary'
 								: wrapperClass,
 							{ 'pl-7': leadingText },
 							{ 'pr-7': trailingText }
@@ -74,7 +96,7 @@ export const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>(
 						</div>
 					)}
 				</div>
-				<Error name={rest.name} />
+				{withError && <Error name={rest.name} />}
 			</div>
 		);
 	}
