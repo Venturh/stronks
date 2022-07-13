@@ -58,12 +58,15 @@ const defaultColumns = [
 	}),
 	table.createDataColumn('calories', {
 		header: 'Calories',
+		cell: (info) => info.getValue() ?? '-',
 	}),
 	table.createDataColumn('weight', {
 		header: () => 'Weight',
+		cell: (info) => info.getValue() ?? '-',
 	}),
 	table.createDataColumn('bodyFat', {
 		header: 'Body fat',
+		cell: (info) => info.getValue() ?? '-',
 	}),
 	table.createDataColumn('training', {
 		header: 'Training',
