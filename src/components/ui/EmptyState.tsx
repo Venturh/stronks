@@ -22,7 +22,7 @@ export default function EmptyState({ icon, title }: EmptyStateProps) {
 export function SmallEmptyState({ icon, title, ...props }: EmptyStateProps) {
 	return (
 		<div className="flex items-center w-full h-full px-4 py-3 rounded-lg focus:outline-none bg-secondary">
-			{icon && <ButtonIcon className="w-6 h-6 text-secondary">{icon}</ButtonIcon>}
+			{icon && <ButtonIcon className="w-5 h-5 text-secondary">{icon}</ButtonIcon>}
 			<span className="block ml-4 text-sm font-medium text-primary">{title}</span>
 		</div>
 	);

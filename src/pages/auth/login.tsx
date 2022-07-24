@@ -1,62 +1,27 @@
 import { GetServerSideProps } from 'next';
 import { NextAuthOptions } from 'next-auth';
 import { signIn } from 'next-auth/react';
-import { object, string } from 'zod';
 
 import LandingLayout from 'components/layouts/LandingLayout';
-import Form from 'components/ui/Form';
-import Input from 'components/ui/Input';
+
 import Button from 'components/ui/Button';
 
 import { unauthenticatedRoute } from 'utils/redirects';
-import { useFormValidation } from 'hooks/useForm';
 
 const title = 'Sign in';
 const description = 'Welcome back.';
 
-const loginSchema = object({
-	email: string().nonempty().email(),
-});
-
 function Login({}: NextAuthOptions) {
-	const form = useFormValidation({
-		schema: loginSchema,
-	});
-
 	return (
 		<LandingLayout title={title} description={description}>
 			<div className="w-full max-w-md pt-12 m-auto space-y-4">
-				<div className="flex flex-col w-full max-w-sm p-3 mx-auto space-y-3 rounded-lg shadow-sm ring dark:shadow-none bg-secondary ring-accent-primary">
+				<div className="w-full max-w-sm p-3 mx-auto rounded-lg shadow-sm ring dark:shadow-none bg-secondary ring-accent-primary">
 					<div className="space-y-2">
 						<h1 className="text-5xl font-semibold">{title}</h1>
 						<h2 className="text-2xl text-secondary">{description}</h2>
 					</div>
-					<Form
-						name="login"
-						submitButtonText="Login"
-						form={form}
-						onSubmit={({ email }) => signIn('email', { email })}
-						disabled
-					>
-						<Input
-							disabled
-							label="Email"
-							type="email"
-							autoComplete="email"
-							{...form.register('email')}
-						/>
-					</Form>
 
-					<div className="relative mt-6">
-						<div className="absolute inset-0 flex items-center" aria-hidden="true">
-							<div className="w-full border-t border-accent-primary"></div>
-						</div>
-						<div className="relative flex justify-center text-sm">
-							<span className="px-2 text-secondary">Or continue with</span>
-						</div>
-					</div>
-
-					<div className="flex flex-col space-y-2">
+					<div className="flex flex-col mt-6 space-y-2">
 						<Button
 							className="w-full"
 							variant="outline"

@@ -12,7 +12,6 @@ export interface NextAuthUserWithStringId extends NextAuthUser {
 }
 
 async function refreshAccessToken(account: Account) {
-	console.log('REFRESH ACCESS TOKEN');
 	try {
 		const url =
 			'https://oauth2.googleapis.com/token?' +
@@ -36,7 +35,7 @@ async function refreshAccessToken(account: Account) {
 			throw new Error(data.error_description);
 		}
 
-		const expires_at = dayjs((Date.now() / 1000 + data.expires_in) * 1000).unix();
+		const expires_at = Date.now() + data.expires_in * 1000;
 
 		await db.account.update({
 			where: {

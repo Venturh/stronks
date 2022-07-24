@@ -1,0 +1,12 @@
+name: scheduledSync
+on:
+  schedule:
+    - cron: '*/0 0 * * *'
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: hourly-cron-job
+        run: |
+          curl --request POST \
+          --url 'https://stronks.vercel.app/api/sync'
