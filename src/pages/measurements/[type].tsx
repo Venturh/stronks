@@ -1,4 +1,5 @@
 import { GetServerSidePropsContext } from 'next';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import type { Measurements } from '@prisma/client';
 
@@ -11,12 +12,20 @@ import { trpc } from 'utils/trpc';
 import { authenticatedRoute } from 'utils/redirects';
 import { toCalendarDate } from 'utils/date';
 import useThingy from 'hooks/useThingy';
+import { useState } from 'react';
+
+const Chart = dynamic(() => import('components/ui/Chart'), {
+	ssr: false,
+});
 
 export default function Weights() {
 	const { query } = useRouter();
 	const type = query.type as 'weight' | 'bodyFat';
-	const { data } = trpc.useQuery(['measurements.index']);
-
+	const [chartInterval, setChartInverval] = useState(30);
+	const { data, isLoading } = trpc.useQuery([
+		'measurements.index',
+		{ interval: chartInterval, type },
+	]);
 	const typeTabs = [
 		{ label: 'Weight', href: '/measurements/weight' },
 		{ label: 'Bodyfat', href: '/measurements/bodyFat' },
@@ -55,6 +64,16 @@ export default function Weights() {
 					days={data?.stats.days}
 					primary={data?.stats.primary}
 					secondary={data?.stats.secondary}
+				/>
+			</div>
+			<div className="my-4">
+				<Chart
+					hideYAxis
+					unit={type === 'weight' ? 'kg' : '%'}
+					// @ts-expect-error yep
+					series={data?.series ?? []}
+					loading={isLoading}
+					onTimeRangeChange={setChartInverval}
 				/>
 			</div>
 
