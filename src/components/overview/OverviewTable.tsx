@@ -271,7 +271,11 @@ export default function OverviewTable({
 				</ReactSortable>
 			</SlideOver>
 			<OverviewEditModal
-				filterIds={instance.getSelectedRowModel().flatRows.flatMap(({ original }) => original!.id)}
+				filterIds={
+					instance
+						.getSelectedRowModel()
+						.flatRows.flatMap(({ original }) => original!.id) as string[]
+				}
 				onChange={() => setRowSelection([])}
 			/>
 		</>
