@@ -58,7 +58,7 @@ export function ErrorMessage({ title, error }: ErrorProps) {
 	if (!error) return null;
 
 	return (
-		<div className="p-4 text-sm text-black rounded-lg space-y-1 bg-opacity-10 bg-error">
+		<div className="p-4 space-y-1 text-sm text-black rounded-lg bg-opacity-10 bg-error">
 			<h3 className="font-medium">{title}</h3>
 			<div>{error.message}</div>
 		</div>

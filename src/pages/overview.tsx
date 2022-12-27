@@ -19,7 +19,6 @@ export default function Home() {
 	return (
 		<AppLayout
 			title="Overview"
-			small
 			actions={
 				<Button className="ml-2" loading={sync!.isLoading} onClick={() => sync.mutateAsync()}>
 					Sync
@@ -29,6 +28,7 @@ export default function Home() {
 			{data && data.items.length > 0 && (
 				<OverviewTable
 					items={data.items}
+					habits={data.habits}
 					orderOverviewColumns={data.orderOverviewColumns}
 					hiddenTableHeaders={data.hiddenOverviewColumns}
 				/>

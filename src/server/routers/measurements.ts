@@ -29,16 +29,18 @@ export const measurementsRouter = createRouter().query('index', {
 			(w) => w.measuredAt >= dayjs().subtract(new Date().getDay(), 'day').toDate()
 		);
 
-		// const now = dayjs('2022-07-16T20:20:04.046Z');
 		const now = dayjs();
 		const dates = Array.from({ length: interval }, (_, i) => now.subtract(i, 'day').toDate());
 
-		let latestMeasurement: number | null = null;
-		const series = dates.map((measuredAt) => {
-			const measurement = measurements.find((m) => dayjs(m.measuredAt).isSame(measuredAt, 'day'));
-			if (measurement) latestMeasurement = measurement[type];
-			return [measuredAt, measurement ? measurement[type] : latestMeasurement];
-		});
+		const series = dates
+			.map((measuredAt) => {
+				const measurement = measurements.find((m) => dayjs(m.measuredAt).isSame(measuredAt, 'day'));
+
+				return [measuredAt, measurement ? measurement[type] : null];
+			})
+			.filter((s) => s[1] !== null);
+
+		const weightGoalSeries = series.map((s) => [s[0], 80]);
 
 		const { days } = generateWeekyDayTrack(latestMeasurements, () => {
 			Object.assign(stats, {
@@ -46,8 +48,6 @@ export const measurementsRouter = createRouter().query('index', {
 				secondary: '',
 			});
 		});
-
-		const weightGoalSeries = series.map((s) => [s[0], 80]);
 
 		return {
 			items,

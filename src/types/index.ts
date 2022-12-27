@@ -2,7 +2,9 @@ import { Phase } from '@prisma/client';
 
 export type WithOutIdAndTimestamps<T> = Omit<T, 'id' | 'createdAt' | 'updatedAt'>;
 
-export type OverviewData = {
+export interface OverviewData {
+	// [key: string]: string | boolean | null;
+
 	id: string;
 	date: string;
 	phase: Phase;
@@ -12,4 +14,4 @@ export type OverviewData = {
 	training: boolean;
 	creatine: boolean;
 	notes: string | null;
-};
+}

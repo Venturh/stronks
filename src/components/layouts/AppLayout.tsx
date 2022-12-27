@@ -61,14 +61,14 @@ export default function AppLayout({ children, title, small, actions, secondaryAc
 									</div>
 								</div>
 								{secondaryActions && (
-									<div className="py-3 border-b bg-secondary border-accent-primary">
-										<div className="w-full px-4">{secondaryActions}</div>
+									<div className="p-3 border-b bg-secondary border-accent-primary">
+										{secondaryActions}
 									</div>
 								)}
 							</div>
 							<div
 								className={clsx(
-									'px-4 mx-auto overflow-x-scroll overflow-y-hidden mt-4 md:px-0',
+									'px-4 mx-auto overflow-x-scroll overflow-y-hidden mt-4',
 									small ? 'max-w-4xl ' : 'max-w-7xl'
 								)}
 							>

@@ -22,7 +22,7 @@ export default function Home() {
 
 	const utils = trpc.useContext();
 	const { data, error } = trpc.useQuery(['nutrition.show', { category, measuredFormat: date }]);
-	const removeMutation = trpc.useMutation(['nutrition.destroy']);
+	const removeMutation = trpc.useMutation(['nutrition.delete']);
 
 	if (error) {
 		return <NextError statusCode={404} />;

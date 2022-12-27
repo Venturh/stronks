@@ -131,10 +131,25 @@ const createOptions = (req: NextApiRequest): NextAuthOptions => ({
 					where: { id: user.id },
 					data: {
 						image: `https://api.multiavatar.com/${user.name ?? user.email}.png`,
-						hiddenOverviewColumns: [],
 					},
 				});
 			}
+			await db.user.update({
+				where: { id: user.id },
+				data: {
+					hiddenOverviewColumns: [],
+					orderOverviewColumns: [
+						'date',
+						'phase',
+						'calories',
+						'weight',
+						'bodyFat',
+						'creatine',
+						'training',
+						'notes',
+					],
+				},
+			});
 		},
 	},
 

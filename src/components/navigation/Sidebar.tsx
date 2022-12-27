@@ -6,6 +6,7 @@ import {
 	HomeIcon,
 	LightningBoltIcon,
 	CollectionIcon,
+	SwitchHorizontalIcon,
 } from '@heroicons/react/outline';
 import clsx from 'clsx';
 
@@ -27,6 +28,7 @@ export default function Sidebar() {
 		{ name: 'Nutrition', href: '/nutrition', icon: BeakerIcon },
 		{ name: 'Workouts', href: '/workouts', icon: FireIcon },
 		{ name: 'Steps', href: '/steps', icon: LightningBoltIcon },
+		{ name: 'Habits', href: '/habits', icon: SwitchHorizontalIcon },
 	];
 
 	const secondaryNavigation = [{ name: 'Settings', href: '/settings/sync', icon: CogIcon }];

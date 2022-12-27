@@ -62,7 +62,7 @@ export const nutritionRouter = createRouter()
 			return await createNutrition({ userId: user!.id, synced: false, ...rest }, date);
 		},
 	})
-	.mutation('destroy', {
+	.mutation('delete', {
 		input: z.object({ id: z.string() }),
 		async resolve({ input: { id } }) {
 			return await db.nutrition.delete({ where: { id } });

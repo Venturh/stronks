@@ -63,6 +63,7 @@ model User {
     activitySteps         ActivitySteps[]
     googleFitSettings     GoogleFitSetting[]
     additonal             Info[]
+    habits                Habits[]
 }
 
 model GoogleFitSetting {
@@ -187,5 +188,42 @@ model Info {
     workouts       Workouts[]
     activitySteps  ActivitySteps[]
     supplement     Supplements?
+    completedHabits     CompletedHabits[]
     user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum HabitCategory {
+    PHYSICAL_FITNESS
+    MENTAL_HEALTH
+    PERSONAL_DEVELOPMENT
+    CAREER
+    MONEY
+    COMMUNICATION
+    ROMANCE
+    HOBBIES
+    SUSTAINABILITY
+    CREATIVITY
+    TIME_MANAGEMENT
+    STRESS_MANAGEMENT
+    SELF_CARE
+    HOME_ORGANIZATION
+}
+
+model Habits {
+    id               String   @id @default(uuid())
+    name             String
+    emote            String?
+    category         HabitCategory
+    userId           String
+    completedHabits           CompletedHabits[]
+    user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CompletedHabits {
+    id               String   @id @default(uuid())
+    completedAt      DateTime
+    habitId          String
+    infoId           String?
+    habit            Habits   @relation(fields: [habitId], references: [id], onDelete: Cascade)
+    info             Info?    @relation(fields: [infoId], references: [id])
 }

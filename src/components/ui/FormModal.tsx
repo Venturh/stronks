@@ -69,6 +69,7 @@ export default function FormModal<T extends FieldValues>({
 							<div ref={cancelButtonRef} />
 							{deleteAction ? (
 								<Button
+									form="formId"
 									loading={deleteActionLoading}
 									disabled={deleteActionDisabled}
 									variant="ghost"
@@ -101,7 +102,7 @@ export default function FormModal<T extends FieldValues>({
 				<div>
 					{children}
 					{Object.keys(form.formState.errors).length > 0 && (
-						<div className="max-h-[128px] mt-4 ring-1 rounded ring-accent-primary p-2 overflow-y-scroll">
+						<div className="p-2 mt-4 rounded ring-1 ring-accent-primary">
 							{Object.keys(form.formState.errors).map((key) => (
 								<Error withName name={key} key={key} />
 							))}

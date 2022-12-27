@@ -1,4 +1,4 @@
-import DescriptionList from 'components/ui/DescripitonList';
+import { DescriptionList } from 'components/ui/DescripitonList';
 import Form from 'components/ui/Form';
 import ThemeSwitch from 'components/ui/ThemeToggle';
 import { useFormValidation } from 'hooks/useForm';

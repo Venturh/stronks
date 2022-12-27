@@ -9,6 +9,7 @@ import { overviewRouter } from './overview';
 import { nutritionRouter } from './nutrition';
 import { workoutsRouter } from './workouts';
 import { stepsRouter } from './steps';
+import { habitsRouter } from './habits';
 
 export const appRouter = createRouter()
 	.transformer(superjson)
@@ -20,6 +21,7 @@ export const appRouter = createRouter()
 	.merge('measurements.', measurementsRouter)
 	.merge('workouts.', workoutsRouter)
 	.merge('steps.', stepsRouter)
+	.merge('habits.', habitsRouter)
 	.merge('overview.', overviewRouter);
 
 export type AppRouter = typeof appRouter;

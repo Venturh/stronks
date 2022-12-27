@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { EyeOffIcon } from '@heroicons/react/outline';
 import {
 	ColumnOrderState,
 	createTable,
@@ -7,12 +6,10 @@ import {
 	useTableInstance,
 	VisibilityState,
 } from '@tanstack/react-table';
-import { Phase } from '@prisma/client';
+import { Habits, Phase } from '@prisma/client';
 import { ItemInterface, ReactSortable } from 'react-sortablejs';
 
 import Select from 'components/ui/Select';
-import Checkbox from 'components/ui/Checkbox';
-import NestedMenu from 'components/ui/NestedMenu';
 
 import { trpc } from 'utils/trpc';
 import type { Color } from '../ui/Button';
@@ -22,13 +19,16 @@ import IconButton from '../ui/IconButton';
 import SlideOver from '../ui/SlideOver';
 import clsx from 'clsx';
 import OverviewEditModal from './OverviewEditModal';
+import CheckboxDiv from 'components/ui/CheckDiv';
+import Checkbox from 'components/ui/Checkbox';
 
 type Props = {
 	items: OverviewData[];
 	hiddenTableHeaders: string[];
 	orderOverviewColumns: string[];
+	habits: Habits[];
 };
-const table = createTable().setRowType<OverviewData>();
+const table = createTable().setRowType<Partial<OverviewData>>();
 
 const defaultColumns = [
 	table.createDisplayColumn({
@@ -70,12 +70,12 @@ const defaultColumns = [
 	}),
 	table.createDataColumn('training', {
 		header: 'Training',
-		cell: ({ cell, instance }) => <CheckboxCell disabled {...cell} instance={instance} />,
+		cell: ({ cell, instance }) => <CheckboxDivCell disabled {...cell} instance={instance} />,
 	}),
 	table.createDataColumn('creatine', {
 		header: 'Creatine',
 		cell: ({ cell, instance }) => (
-			<CheckboxCell updateKey="creatine" {...cell} instance={instance} />
+			<CheckboxDivCell updateKey="creatine" {...cell} instance={instance} />
 		),
 	}),
 	table.createDataColumn('notes', {
@@ -84,9 +84,15 @@ const defaultColumns = [
 	}),
 ];
 
-export default function OverviewTable({ items, hiddenTableHeaders, orderOverviewColumns }: Props) {
-	const orderOverviewColumnsWithCheckbox = ['toggle', ...orderOverviewColumns];
-	const initialVisibility = orderOverviewColumnsWithCheckbox.reduce<Record<string, any>>(
+export default function OverviewTable({
+	items,
+	hiddenTableHeaders,
+	orderOverviewColumns,
+	habits,
+}: Props) {
+	const orderOverviewColumnsWithCheckboxDiv = ['toggle', ...orderOverviewColumns];
+
+	const initialVisibility = orderOverviewColumnsWithCheckboxDiv.reduce<Record<string, any>>(
 		(acc, curr) => {
 			acc[curr] = hiddenTableHeaders.includes(curr) ? false : true;
 			return acc;
@@ -95,10 +101,25 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 	);
 
 	const [data] = React.useState(() => [...items]);
-	const [columns] = React.useState<typeof defaultColumns>(() => [...defaultColumns]);
+
+	const habitColumns = habits.map(({ name, id }) =>
+		// @ts-ignore
+		table.createDataColumn(id, {
+			header: () => name,
+			// @ts-ignore
+			cell: ({ cell, instance }) => (
+				<CheckboxDivCell isHabit updateKey={id} {...cell} instance={instance} />
+			),
+		})
+	);
+
+	const [columns] = React.useState<typeof defaultColumns>(() => [
+		...defaultColumns,
+		...habitColumns,
+	]);
 	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(initialVisibility);
 	const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
-		orderOverviewColumnsWithCheckbox
+		orderOverviewColumnsWithCheckboxDiv
 	);
 	const [columnVisibilityList, setColumnVisibilityList] = useState<ItemInterface[]>(
 		Object.entries(columnVisibility).map(([id, visible]) => ({ id, visible }))
@@ -127,7 +148,9 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 			...columnVisibility,
 			[id]: show,
 		};
+
 		const hiddenOverviewColumns = Object.keys(visibility).filter((key) => !visibility[key]);
+
 		await editUser.mutateAsync({
 			data: {
 				hiddenOverviewColumns,
@@ -157,41 +180,17 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 						<tr key={headerGroup.id}>
 							{headerGroup.headers.map((header, i) => (
 								<th
-									className={clsx('font-medium tracking-wider text-left uppercase text-primary', {
-										'relative w-12 px-6 sm:w-16 sm:px-8': header.id === 'toggle',
-										'min-w-[8rem]': i === 1,
-									})}
+									className={clsx(
+										'font-medium tracking-wider text-left uppercase text-primary flex-shrink-0 flex-1 text-xs',
+										{
+											'relative w-12 px-4': header.id === 'toggle',
+											'min-w-[8rem]': i === 1,
+										}
+									)}
 									key={header.id}
 									colSpan={header.colSpan}
 								>
-									{header.id !== 'toggle' ? (
-										<NestedMenu
-											className={clsx(
-												'py-4 px-1.5 font-medium tracking-wider text-left uppercase text-xxs text-primary',
-												{
-													'min-w-[8rem]': i === 1,
-												}
-											)}
-											menuItems={[
-												{
-													items: [
-														{
-															text: 'Hide column',
-															icon: <EyeOffIcon />,
-															action: async () => {
-																header.column.toggleVisibility(false);
-																await editColumVisibility(header.column.id, false);
-															},
-														},
-													],
-												},
-											]}
-										>
-											<span>{header.isPlaceholder ? null : header.renderHeader()}</span>
-										</NestedMenu>
-									) : (
-										<span>{header.isPlaceholder ? null : header.renderHeader()}</span>
-									)}
+									{header.isPlaceholder ? null : header.renderHeader()}
 								</th>
 							))}
 							<th className="py-4 px-1.5 font-medium tracking-wider text-left uppercase text-xxs text-primary">
@@ -213,7 +212,7 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 								<td
 									className={clsx(
 										'px-2 py-3 text-sm text-left  whitespace-nowrap',
-										index === 0 ? 'relative w-12 px-6 sm:w-16 sm:px-8' : 'w-28'
+										index === 0 ? 'w-12 px-4' : 'w-28'
 									)}
 									key={cell.id}
 								>
@@ -249,7 +248,9 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 									<div className="flex justify-between">
 										<div className="flex items-center ">
 											<MenuIcon className="w-3.5 h-3.5 text-secondary" />
-											<span className="ml-1 text-sm capitalize">{id}</span>
+											<span className="ml-1 text-sm capitalize">
+												{habits.find((h) => h.id === id)?.name || id}
+											</span>
 										</div>
 										<IconButton
 											onClick={async () => {
@@ -278,7 +279,9 @@ export default function OverviewTable({ items, hiddenTableHeaders, orderOverview
 }
 
 function PhaseCell({ row, getValue }: { row: any; getValue: () => any }) {
-	const update = trpc.useMutation('overview.update');
+	const update = trpc.useMutation('overview.update', {
+		onSuccess: () => trpc.useContext().invalidateQueries('overview.index'),
+	});
 
 	const infoId = row.original!.id;
 	const initalValue = getValue();
@@ -329,17 +332,19 @@ function TextCell({ getValue, row }: { instance: any; row: any; getValue: () => 
 	);
 }
 
-function CheckboxCell({
+function CheckboxDivCell({
 	getValue,
 	row,
 	disabled,
 	updateKey,
+	isHabit,
 }: {
 	disabled?: boolean;
 	instance: any;
 	row: any;
 	getValue: () => any;
 	updateKey?: keyof OverviewData;
+	isHabit?: boolean;
 }) {
 	const infoId = row.original!.id;
 	const initialValue = getValue();
@@ -349,16 +354,16 @@ function CheckboxCell({
 	async function onChange(checked: boolean) {
 		if (updateKey) {
 			setValue(checked);
+			if (isHabit) return await update.mutateAsync({ infoId, habitId: updateKey });
 			await update.mutateAsync({ infoId, [updateKey]: checked });
 		}
 	}
 
 	return (
-		<Checkbox
-			color="secondary"
+		<CheckboxDiv
 			disabled={disabled}
 			checked={value}
-			onChecked={async (checked) => onChange(checked)}
+			onChange={async (checked) => onChange(checked)}
 		/>
 	);
 }

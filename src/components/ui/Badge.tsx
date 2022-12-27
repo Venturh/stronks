@@ -58,7 +58,7 @@ const variants = {
 export default function Badge({
 	size = 'sm',
 	color = 'brand',
-	variant = 'solid',
+	variant = 'subtle',
 	children,
 	className,
 	onRemove,

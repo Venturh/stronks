@@ -36,54 +36,19 @@ export default function Tabs({ activeIndex, items, maxWidth }: Props) {
 
 	const length = items.length;
 
-	const options = new Map([
-		[
-			1,
-			{
-				translate: {
-					'translate-x-0': selected === 0,
-				},
-				width: 'w-32',
-			},
-		],
-		[
-			2,
-			{
-				translate: {
-					'translate-x-0': selected === 0,
-					'translate-x-[100%]': selected === 1,
-				},
-				width: 'w-1/2',
-			},
-		],
-		[
-			3,
-			{
-				translate: {
-					'translate-x-0': selected === 0,
-					'translate-x-full': selected === 1,
-					'translate-x-[200%]': selected === 2,
-				},
-				width: 'w-1/3',
-			},
-		],
-	]);
-
-	const mappedOptions = options.get(length);
-
 	return (
 		<nav
 			className={clsx(
 				'relative w-full overflow-x-scroll rounded-md ring-1 bg-secondary ring-accent-primary',
-				maxWidth ?? 'max-w-xs'
+				maxWidth ?? 'max-w-xl'
 			)}
 		>
 			<div
-				className={clsx(
-					'absolute inset-y-0 h-full transition-transform transform',
-					mappedOptions?.width,
-					mappedOptions?.translate
-				)}
+				className={clsx('absolute inset-y-0 h-full transition-transform transform')}
+				style={{
+					width: `calc(100% / ${length})`,
+					transform: `translateX(${selected * 100}%)`,
+				}}
 			>
 				<div className={clsx('w-full h-full bg-accent-primary rounded-md')}></div>
 			</div>
@@ -98,9 +63,11 @@ export default function Tabs({ activeIndex, items, maxWidth }: Props) {
 						key={label}
 						href={href}
 						className={clsx(
-							'py-1  text-center text-sm cursor-pointer select-none focus:outline-none capitalize font-medium',
-							mappedOptions?.width
+							'py-1  text-center text-sm cursor-pointer select-none focus:outline-none capitalize font-medium'
 						)}
+						style={{
+							width: `calc(100% / ${length})`,
+						}}
 					>
 						<span>{label}</span>
 					</Clickable>

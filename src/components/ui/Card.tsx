@@ -19,7 +19,7 @@ export default function Card({ main, second, children, color, loading }: CardIte
 		<div
 			className={clsx(
 				{ 'space-y-4': !main },
-				'py-4 px-3 rounded-lg shadow sm:p-4 bg-secondary w-full h-full'
+				'sm:rounded-lg px-4 py-5 sm:px-6 shadow sm:p-4 bg-secondary w-full h-full'
 			)}
 		>
 			{loading ? (

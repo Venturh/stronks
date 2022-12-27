@@ -13,6 +13,7 @@ type Props = {
 
 export default function OverviewEditModal({ filterIds, onChange }: Props) {
 	const update = trpc.useMutation('overview.bulk-update');
+	const context = trpc.useContext();
 
 	const phases = [
 		{ label: 'Maintain', value: Phase.MAINTAIN },
@@ -24,7 +25,11 @@ export default function OverviewEditModal({ filterIds, onChange }: Props) {
 	const [creatine, setCreatine] = useState(false);
 
 	async function submit() {
-		await update.mutateAsync({ infoIds: filterIds, phase, creatine });
+		await update.mutateAsync(
+			{ infoIds: filterIds, phase, creatine },
+			{ onSuccess: async () => await context.invalidateQueries(['overview.index']) }
+		);
+		console.log('submit');
 		onChange();
 	}
 

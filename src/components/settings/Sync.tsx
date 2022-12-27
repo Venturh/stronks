@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import Switch from 'components/ui/Switch';
-import DescriptionList from 'components/ui/DescripitonList';
+import { DescriptionList } from 'components/ui/DescripitonList';
 
 import { trpc } from 'utils/trpc';
 

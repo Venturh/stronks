@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { AggregatedDataSourceResponse, DataSourceResponse, FitSession } from './types';
 
 export async function getSessionData(accessToken: string) {
-	const startTime = dayjs().subtract(2, 'months').toISOString();
+	const startTime = dayjs().subtract(5, 'months').toISOString();
 	const { data }: AxiosResponse<FitSession> = await axios.get(
 		`https://www.googleapis.com/fitness/v1/users/me/sessions/?startTime=${startTime}`,
 		{
@@ -17,8 +17,8 @@ export async function getSessionData(accessToken: string) {
 }
 
 export async function getDatasetData(accessToken: string, dataSourceId: string) {
-	const startTime = dayjs().subtract(2, 'months').unix() * 1000000000;
-	const endTime = dayjs().subtract(0, 'days').unix() * 1000000000;
+	const startTime = dayjs().subtract(5, 'months').unix() * 1000000000;
+	const endTime = dayjs().subtract(12, 'days').unix() * 1000000000;
 	const { data }: AxiosResponse<DataSourceResponse> = await axios.get(
 		`https://www.googleapis.com/fitness/v1/users/me/dataSources/${dataSourceId}/datasets/${endTime}-${startTime}`,
 		{
@@ -35,8 +35,8 @@ export async function getAggregatedData(
 	dataTypeNames: string[],
 	aggregation: 'bucketBySession' | 'bucketByActivitySegment' | 'bucketByTime' = 'bucketByTime'
 ) {
-	const startTime = dayjs().subtract(2, 'months').startOf('day').unix() * 1000;
-	const endTime = dayjs().subtract(0, 'days').endOf('day').unix() * 1000;
+	const startTime = dayjs().subtract(6, 'months').startOf('day').unix() * 1000;
+	const endTime = dayjs().subtract(4, 'months').endOf('day').unix() * 1000;
 	const { data }: AxiosResponse<AggregatedDataSourceResponse> = await axios.post(
 		'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',
 		{
