@@ -5,7 +5,6 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter';
 
 import { db } from 'lib/prisma';
 import { Account, User } from '@prisma/client';
-import dayjs from 'dayjs';
 
 export interface NextAuthUserWithStringId extends NextAuthUser {
 	id: string;
@@ -144,7 +143,6 @@ const createOptions = (req: NextApiRequest): NextAuthOptions => ({
 						'calories',
 						'weight',
 						'bodyFat',
-						'creatine',
 						'training',
 						'notes',
 					],

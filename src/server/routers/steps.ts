@@ -13,6 +13,7 @@ export const stepsRouter = createRouter().query('index', {
 			where: { userId: user?.id },
 			orderBy: { measuredFormat: 'desc' },
 		});
+
 		const items = groupBy(steps, (s) => getMonth(s));
 
 		const stats = { primary: 0, secondary: 0 };
@@ -20,8 +21,10 @@ export const stepsRouter = createRouter().query('index', {
 		const latestSteps = steps.filter(
 			({ measuredFormat, steps }) =>
 				dayjs(measuredFormat).toDate() >= dayjs().subtract(new Date().getDay(), 'days').toDate() &&
-				steps >= 500
+				steps >= 100
 		);
+
+		console.log(latestSteps);
 
 		const { days } = generateWeekyDayTrack(latestSteps, (stepsData) => {
 			Object.assign(stats, {

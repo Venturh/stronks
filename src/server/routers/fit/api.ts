@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import dayjs from 'dayjs';
+import { db } from 'lib/prisma';
 import { AggregatedDataSourceResponse, DataSourceResponse, FitSession } from './types';
 
 export async function getSessionData(accessToken: string) {
@@ -30,13 +31,22 @@ export async function getDatasetData(accessToken: string, dataSourceId: string) 
 	);
 	return data;
 }
-export async function getAggregatedData(
+
+async function getAggregatedDataPerInterval(
 	accessToken: string,
 	dataTypeNames: string[],
-	aggregation: 'bucketBySession' | 'bucketByActivitySegment' | 'bucketByTime' = 'bucketByTime'
-) {
-	const startTime = dayjs().subtract(6, 'months').startOf('day').unix() * 1000;
-	const endTime = dayjs().subtract(4, 'months').endOf('day').unix() * 1000;
+	aggregation: 'bucketBySession' | 'bucketByActivitySegment' | 'bucketByTime' = 'bucketByTime',
+	startTime: number
+): Promise<AggregatedDataSourceResponse> {
+	const endTime = dayjs(startTime).add(2, 'months').endOf('day').unix() * 1000;
+	const todayEndTime = dayjs().endOf('day').unix() * 1000;
+
+	if (endTime > todayEndTime) {
+		return {
+			bucket: [],
+		};
+	}
+
 	const { data }: AxiosResponse<AggregatedDataSourceResponse> = await axios.post(
 		'https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',
 		{
@@ -66,5 +76,45 @@ export async function getAggregatedData(
 			},
 		}
 	);
+	return data;
+}
+
+export async function getAggregatedData(
+	accessToken: string,
+	dataTypeNames: string[],
+	type: 'measurements' | 'nutrition' | 'activitySteps' | 'workouts',
+	userId: string,
+	aggregation: 'bucketBySession' | 'bucketByActivitySegment' | 'bucketByTime' = 'bucketByTime'
+) {
+	let startTime = dayjs().subtract(1, 'year').startOf('day').unix() * 1000;
+
+	//@ts-ignore
+	const latestData = await db[type].findFirst({
+		where: {
+			userId,
+		},
+		orderBy: {
+			measuredFormat: 'desc',
+		},
+	});
+
+	if (latestData) {
+		startTime = dayjs(latestData.measuredFormat).startOf('day').unix() * 1000;
+	}
+
+	const data: AggregatedDataSourceResponse = { bucket: [] };
+
+	do {
+		const newData = await getAggregatedDataPerInterval(
+			accessToken,
+			dataTypeNames,
+			aggregation,
+			startTime
+		);
+		if (newData.bucket.length === 0) break;
+		startTime = Number(newData.bucket[newData.bucket.length - 1].startTimeMillis);
+		data.bucket.push(...newData.bucket);
+	} while (data.bucket.length !== 0);
+
 	return data;
 }

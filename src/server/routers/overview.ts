@@ -16,11 +16,10 @@ export const overviewRouter = createRouter()
                         phase,calories,round("weight"::numeric,2) AS "weight",
                         round("bodyFat"::numeric,2) AS "bodyFat",
                         (ac."workoutDuration" IS NOT NULL) AS "training",
-                        ac."workoutDuration",notes,i."id","creatine" FROM"Info" AS i
+                        ac."workoutDuration",notes,i."id" FROM"Info" AS i
                         LEFT JOIN(SELECT"userId","measuredFormat",SUM(calories)AS calories FROM"Nutrition" GROUP BY"measuredFormat","userId")n ON i."userId"=n."userId" AND i."measuredFormat"=n."measuredFormat"
                          LEFT JOIN(SELECT"userId","measuredFormat","weight","bodyFat" FROM"Measurements" AS me)m ON i."userId"=m."userId" AND i."measuredFormat"=m."measuredFormat"
                          LEFT JOIN(SELECT"userId","measuredFormat",sum(duration)AS"workoutDuration" FROM"Workouts" GROUP BY"userId","measuredFormat")ac ON i."userId"=ac."userId" AND i."measuredFormat"=ac."measuredFormat"
-                         LEFT JOIN(SELECT"userId","measuredFormat",creatine FROM"Supplements")su ON i."userId"=su."userId" AND i."measuredFormat"=su."measuredFormat"
                          ORDER BY i."measuredFormat" DESC;
             `) as OverviewData[];
 
@@ -62,16 +61,14 @@ export const overviewRouter = createRouter()
 			infoId: z.string(),
 			phase: z.nativeEnum(Phase).optional(),
 			notes: z.string().optional(),
-			creatine: z.boolean().optional(),
 			habitId: z.string().optional(),
 		}),
-		async resolve({ input: { phase, notes, infoId, creatine, habitId } }) {
+		async resolve({ input: { phase, notes, infoId, habitId } }) {
 			const info = await db.info.update({
 				where: { id: infoId },
 				data: {
 					phase,
 					notes,
-					supplement: { update: { creatine } },
 				},
 			});
 
@@ -107,13 +104,29 @@ export const overviewRouter = createRouter()
 		input: z.object({
 			infoIds: z.array(z.string()),
 			phase: z.nativeEnum(Phase),
-			creatine: z.boolean(),
+			habitIds: z.array(z.string()).optional(),
 		}),
-		async resolve({ input: { phase, infoIds, creatine } }) {
+		async resolve({ input: { phase, infoIds, habitIds } }) {
 			await db.info.updateMany({
 				where: { id: { in: infoIds } },
 				data: { phase },
 			});
-			await db.supplements.updateMany({ where: { infoId: { in: infoIds } }, data: { creatine } });
+
+			habitIds?.forEach(async (habitId) => {
+				await db.completedHabits.deleteMany({
+					where: {
+						habitId,
+					},
+				});
+
+				await db.completedHabits.createMany({
+					data: infoIds.map((infoId) => ({
+						habitId,
+						completedAt: new Date(),
+						infoId,
+					})),
+					skipDuplicates: true,
+				});
+			});
 		},
 	});

@@ -72,12 +72,6 @@ const defaultColumns = [
 		header: 'Training',
 		cell: ({ cell, instance }) => <CheckboxDivCell disabled {...cell} instance={instance} />,
 	}),
-	table.createDataColumn('creatine', {
-		header: 'Creatine',
-		cell: ({ cell, instance }) => (
-			<CheckboxDivCell updateKey="creatine" {...cell} instance={instance} />
-		),
-	}),
 	table.createDataColumn('notes', {
 		header: 'Notes',
 		cell: ({ cell, instance }) => <TextCell {...cell} instance={instance} />,
@@ -276,6 +270,9 @@ export default function OverviewTable({
 						.getSelectedRowModel()
 						.flatRows.flatMap(({ original }) => original!.id) as string[]
 				}
+				visibleHabits={habits.filter(
+					(h) => columnVisibilityList.find((c) => c.id === h.id)?.visible
+				)}
 				onChange={() => setRowSelection([])}
 			/>
 		</>

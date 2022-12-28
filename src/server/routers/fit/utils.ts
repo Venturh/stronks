@@ -12,10 +12,12 @@ import { Nutrition } from '@prisma/client';
 import { WithOutIdAndTimestamps } from 'types';
 
 export async function persistMeasurementsFitData(userId: string, accessToken: string) {
-	const { bucket } = await getAggregatedData(accessToken, [
-		'com.google.weight',
-		'com.google.body.fat.percentage',
-	]);
+	const { bucket } = await getAggregatedData(
+		accessToken,
+		['com.google.weight', 'com.google.body.fat.percentage'],
+		'measurements',
+		userId
+	);
 	const data = await Promise.all(
 		bucket
 			.map(async (buck) => {
@@ -113,6 +115,8 @@ export async function persistWorkoutData(accessToken: string, userId: string) {
 	const { bucket } = await getAggregatedData(
 		accessToken,
 		['com.google.calories.expended', 'com.google.active_minutes'],
+		'workouts',
+		userId,
 		'bucketBySession'
 	);
 	const data = await Promise.all(
@@ -153,6 +157,8 @@ export async function persistActivityStepsData(accessToken: string, userId: stri
 			'com.google.active_minutes',
 			'com.google.speed',
 		],
+		'activitySteps',
+		userId,
 		'bucketByTime'
 	);
 
@@ -223,9 +229,6 @@ async function createOrUpateInfo(measuredFormat: Date, userId: string) {
 	else {
 		const user = await db.user.findUnique({ where: { id: userId } });
 		const newInfo = await db.info.create({ data: { measuredFormat, userId, phase: user?.phase } });
-		await db.supplements.create({
-			data: { infoId: newInfo.id, measuredFormat, userId },
-		});
 		return newInfo.id;
 	}
 }

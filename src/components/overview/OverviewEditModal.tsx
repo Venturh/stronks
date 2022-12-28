@@ -1,17 +1,20 @@
-import { Transition } from '@headlessui/react';
-import { Phase } from '@prisma/client';
-import Button from 'components/ui/Button';
-import Checkbox from 'components/ui/Checkbox';
-import Select from 'components/ui/Select';
 import { Fragment, useState } from 'react';
+import { Transition } from '@headlessui/react';
+import { Habits, Phase } from '@prisma/client';
+
+import Button from 'components/ui/Button';
+import Select from 'components/ui/Select';
+
 import { trpc } from 'utils/trpc';
+import Checkbox from 'components/ui/Checkbox';
 
 type Props = {
 	filterIds: string[];
+	visibleHabits: Habits[];
 	onChange: () => void;
 };
 
-export default function OverviewEditModal({ filterIds, onChange }: Props) {
+export default function OverviewEditModal({ filterIds, visibleHabits, onChange }: Props) {
 	const update = trpc.useMutation('overview.bulk-update');
 	const context = trpc.useContext();
 
@@ -22,15 +25,25 @@ export default function OverviewEditModal({ filterIds, onChange }: Props) {
 	];
 
 	const [phase, setSelectedPhase] = useState<Phase>(Phase.MAINTAIN);
-	const [creatine, setCreatine] = useState(false);
+	const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
 
 	async function submit() {
 		await update.mutateAsync(
-			{ infoIds: filterIds, phase, creatine },
+			{ infoIds: filterIds, phase, habitIds: selectedHabits },
 			{ onSuccess: async () => await context.invalidateQueries(['overview.index']) }
 		);
-		console.log('submit');
+		context.invalidateQueries(['overview.index']);
+		setSelectedHabits([]);
+		setSelectedPhase(Phase.MAINTAIN);
 		onChange();
+	}
+
+	function onChecked(checked: boolean, habit: Habits) {
+		if (checked) {
+			setSelectedHabits([...selectedHabits, habit.id]);
+		} else {
+			setSelectedHabits(selectedHabits.filter((id) => id !== habit.id));
+		}
 	}
 
 	return (
@@ -55,14 +68,15 @@ export default function OverviewEditModal({ filterIds, onChange }: Props) {
 								items={phases}
 							/>
 						</div>
-						<div className="block w-28">
-							<Checkbox
-								color="accent"
-								label="Creatine"
-								checked={creatine}
-								onChange={(e) => setCreatine(e.target.checked)}
-							/>
-						</div>
+						{visibleHabits.map((habit) => (
+							<div className="block w-16" key={habit.id}>
+								<Checkbox
+									onChecked={(checked) => onChecked(checked, habit)}
+									color="accent"
+									label={habit.name}
+								/>
+							</div>
+						))}
 						<Button size="sm" onClick={submit}>
 							Save
 						</Button>

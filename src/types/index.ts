@@ -12,6 +12,5 @@ export interface OverviewData {
 	weight: string | null;
 	bodyFat: string | null;
 	training: boolean;
-	creatine: boolean;
 	notes: string | null;
 }

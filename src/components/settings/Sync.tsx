@@ -28,7 +28,7 @@ export default function Sync() {
 			description="Define which data you want to sync with Google Fit."
 			action={{
 				loading: sync.isLoading,
-				label: 'Sync now',
+				children: 'Sync latest',
 				onClick: async () => await sync.mutateAsync(),
 			}}
 		>
