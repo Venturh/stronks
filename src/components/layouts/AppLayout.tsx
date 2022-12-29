@@ -23,7 +23,7 @@ export default function AppLayout({ children, title, small, actions, secondaryAc
 				<AppNavigation sidebarOpen={sidebarOpen} setSidebarOpen={(open) => setSidebarOpen(open)} />
 				<div className="md:pl-48 ">
 					<div className="flex flex-col">
-						<div className="sticky top-0 z-50 flex items-center flex-shrink-0 h-16 px-4 bg-secondary md:hidden ">
+						{/* <div className="sticky top-0 z-30 flex items-center flex-shrink-0 h-16 px-4 bg-secondary md:hidden ">
 							<button
 								type="button"
 								className="text-secondary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500 md:hidden"
@@ -42,10 +42,10 @@ export default function AppLayout({ children, title, small, actions, secondaryAc
 									<div className="flex items-center justify-end flex-auto w-full">{actions}</div>
 								)}
 							</div>
-						</div>
+						</div> */}
 
 						<div>
-							<div className="sticky z-20 top-[63px] md:top-0 bg-secondary">
+							<div className="sticky z-30 top-[63px] md:top-0 bg-secondary">
 								<div className="border-b border-accent-primary">
 									<div className="items-center justify-between hidden w-full px-4 py-3 md:flex ">
 										{title && (
@@ -66,12 +66,7 @@ export default function AppLayout({ children, title, small, actions, secondaryAc
 									</div>
 								)}
 							</div>
-							<div
-								className={clsx(
-									'px-4 mx-auto overflow-x-scroll overflow-y-hidden mt-4',
-									small ? 'max-w-4xl ' : 'max-w-7xl'
-								)}
-							>
+							<div className={clsx('px-4 mx-auto   mt-4', small ? 'max-w-4xl ' : 'max-w-7xl')}>
 								{children}
 							</div>
 						</div>

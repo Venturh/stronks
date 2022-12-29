@@ -4,9 +4,10 @@ import { Habits, Phase } from '@prisma/client';
 
 import Button from 'components/ui/Button';
 import Select from 'components/ui/Select';
+import Checkbox from 'components/ui/Checkbox';
 
 import { trpc } from 'utils/trpc';
-import Checkbox from 'components/ui/Checkbox';
+import { mappedPhases } from 'utils/phase';
 
 type Props = {
 	filterIds: string[];
@@ -17,12 +18,6 @@ type Props = {
 export default function OverviewEditModal({ filterIds, visibleHabits, onChange }: Props) {
 	const update = trpc.useMutation('overview.bulk-update');
 	const context = trpc.useContext();
-
-	const phases = [
-		{ label: 'Maintain', value: Phase.MAINTAIN },
-		{ label: 'Cutting', value: Phase.CUTTING },
-		{ label: 'Bulking', value: Phase.BULKING },
-	];
 
 	const [phase, setSelectedPhase] = useState<Phase>(Phase.MAINTAIN);
 	const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
@@ -65,7 +60,7 @@ export default function OverviewEditModal({ filterIds, visibleHabits, onChange }
 							<Select
 								value={phase}
 								onChange={(phase) => setSelectedPhase(phase as Phase)}
-								items={phases}
+								items={mappedPhases}
 							/>
 						</div>
 						{visibleHabits.map((habit) => (
