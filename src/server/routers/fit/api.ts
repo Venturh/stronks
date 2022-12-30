@@ -17,9 +17,17 @@ export async function getSessionData(accessToken: string) {
 	return data;
 }
 
-export async function getDatasetData(accessToken: string, dataSourceId: string) {
-	const startTime = dayjs().subtract(5, 'months').unix() * 1000000000;
-	const endTime = dayjs().subtract(12, 'days').unix() * 1000000000;
+export async function getDatasetDataPerInterval(
+	accessToken: string,
+	dataSourceId: string,
+	startTime: number
+) {
+	const endTime =
+		dayjs(startTime / 1000000)
+			.add(2, 'months')
+			.endOf('day')
+			.unix() * 1000000000;
+
 	const { data }: AxiosResponse<DataSourceResponse> = await axios.get(
 		`https://www.googleapis.com/fitness/v1/users/me/dataSources/${dataSourceId}/datasets/${endTime}-${startTime}`,
 		{
@@ -29,6 +37,34 @@ export async function getDatasetData(accessToken: string, dataSourceId: string) 
 			},
 		}
 	);
+	return data;
+}
+export async function getDatasetData(accessToken: string, dataSourceId: string, userId: string) {
+	let startTime = dayjs().subtract(1, 'year').startOf('day').unix() * 1000000000;
+
+	const latestData = await db.nutrition.findFirst({
+		where: {
+			userId,
+		},
+		orderBy: {
+			measuredFormat: 'desc',
+		},
+	});
+
+	if (latestData) {
+		startTime = dayjs(latestData.measuredFormat).startOf('day').unix() * 1000000000;
+	}
+
+	const data: DataSourceResponse = { point: [], dataSourceId };
+
+	do {
+		const newData = await getDatasetDataPerInterval(accessToken, dataSourceId, startTime);
+		startTime = Number(newData?.maxEndTimeNs);
+		if (!newData?.maxEndTimeNs || startTime > dayjs().endOf('day').unix() * 1000000000) {
+			break;
+		}
+		data.point.push(...newData.point);
+	} while (true);
 	return data;
 }
 
@@ -115,6 +151,5 @@ export async function getAggregatedData(
 		startTime = Number(newData.bucket[newData.bucket.length - 1].startTimeMillis);
 		data.bucket.push(...newData.bucket);
 	} while (data.bucket.length !== 0);
-
 	return data;
 }

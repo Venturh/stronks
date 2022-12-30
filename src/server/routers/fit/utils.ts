@@ -56,7 +56,7 @@ export async function persistNutritionFitData(
 	accessToken: string,
 	userId: string
 ) {
-	const { point } = await getDatasetData(accessToken, dataSourceId);
+	const { point } = await getDatasetData(accessToken, dataSourceId, userId);
 	return await Promise.all(
 		point.flatMap(async ({ value, startTimeNanos }) => {
 			const objectId = makeApiUuid([startTimeNanos.toString()]);
@@ -121,8 +121,9 @@ export async function persistWorkoutData(accessToken: string, userId: string) {
 		bucket.map(async (buck) => {
 			const { dataset, session, startTimeMillis } = buck;
 			const { activityType, application, name, id } = session!;
-			const caloriesDataSet = dataset[0]!.point[0]!;
-			const durationDataSet = dataset[1].point[0];
+
+			const duration = dataset[1]?.point[0]?.value[0]?.intVal ?? 0;
+			const calories = dataset[0]?.point[0]?.value[0]?.fpVal ?? 0;
 			const measuredAt = dayjs.unix(startTimeMillis / 1000).toDate();
 			const measuredFormat = toStartOfDay(measuredAt);
 			const data = {
@@ -131,14 +132,13 @@ export async function persistWorkoutData(accessToken: string, userId: string) {
 				measuredAt,
 				measuredFormat,
 				userId,
+				duration,
+				calories,
 				objectId: id,
 				infoId: await createOrUpateInfo(measuredFormat, userId),
 				activityTypeName: activityTypeMapping.get(activityType)!,
 				appName: application.packageName,
-				duration: durationDataSet.value[0].intVal!,
-				calories: caloriesDataSet.value[0].fpVal! as number,
 			};
-
 			return data;
 		})
 	);
@@ -226,7 +226,11 @@ async function createOrUpateInfo(measuredFormat: Date, userId: string) {
 	if (info) return info.id;
 	else {
 		const user = await db.user.findUnique({ where: { id: userId } });
-		const newInfo = await db.info.create({ data: { measuredFormat, userId, phase: user?.phase } });
+		const newInfo = await db.info.upsert({
+			create: { measuredFormat, userId, phase: user?.phase },
+			update: { measuredFormat, userId, phase: user?.phase },
+			where: { measuredFormat },
+		});
 		return newInfo.id;
 	}
 }

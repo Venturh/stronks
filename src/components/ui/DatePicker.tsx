@@ -66,7 +66,6 @@ export default function DatePicker({
 							onChange={(date) => {
 								if (Array.isArray(date)) {
 									const [start, end] = date;
-									console.log(start, end);
 									setStartDate(start as Date);
 									setEndDate(end ? (end as Date) : undefined);
 									return;

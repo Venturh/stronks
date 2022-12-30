@@ -1,5 +1,7 @@
 export type DataSourceResponse = {
 	dataSourceId: string;
+	minStartTimeNs?: string;
+	maxEndTimeNs?: string;
 	point: {
 		startTimeNanos: number;
 		value: {

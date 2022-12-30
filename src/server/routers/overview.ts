@@ -68,8 +68,6 @@ export const overviewRouter = createRouter()
 					orderBy: { name: 'desc' },
 				});
 
-				console.log(info);
-
 				const overview = info.map((item) => {
 					const mappedItem = {
 						id: item.id,

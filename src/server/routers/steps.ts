@@ -24,8 +24,6 @@ export const stepsRouter = createRouter().query('index', {
 				steps >= 100
 		);
 
-		console.log(latestSteps);
-
 		const { days } = generateWeekyDayTrack(latestSteps, (stepsData) => {
 			Object.assign(stats, {
 				primary: stats.primary + 1,
