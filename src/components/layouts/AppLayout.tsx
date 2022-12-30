@@ -66,9 +66,7 @@ export default function AppLayout({ children, title, small, actions, secondaryAc
 									</div>
 								)}
 							</div>
-							<div className={clsx('px-4 mx-auto    mt-4', small ? 'max-w-4xl ' : 'max-w-7xl')}>
-								{children}
-							</div>
+							<div>{children}</div>
 						</div>
 					</div>
 				</div>

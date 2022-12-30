@@ -170,71 +170,74 @@ export default function OverviewTable({
 	}
 
 	return (
-		<div className="overflow-x-auto ">
-			<table className="relative divide-y shadow table-fixed divide-accent-primary ring-1 bg-secondary ring-accent-primary md:rounded-lg">
-				<thead>
-					{instance.getHeaderGroups().map((headerGroup) => (
-						<tr
-							className="font-medium tracking-wider text-left uppercase top-14 bg-secondary text-xxs text-primary"
-							key={headerGroup.id}
-						>
-							{headerGroup.headers.map((header, i) => (
-								<th
-									className={clsx('py-3 px-2  ', {
-										'relative w-12 px-4': header.id === 'toggle',
-										'min-w-[8rem]': i === 1,
-									})}
-									key={header.id}
-									colSpan={header.colSpan}
-								>
-									{header.isPlaceholder ? null : header.renderHeader()}
+		<>
+			<div className="block max-h-screen overflow-x-auto ">
+				<table className="relative min-w-full overflow-x-scroll divide-y shadow table-fixed divide-accent-primary ring-1 bg-secondary ring-accent-primary md:rounded-lg">
+					<thead>
+						{instance.getHeaderGroups().map((headerGroup) => (
+							<tr
+								className="sticky top-0 z-10 font-medium tracking-wider text-left uppercase bg-secondary text-xxs text-primary"
+								key={headerGroup.id}
+							>
+								{headerGroup.headers.map((header, i) => (
+									<th
+										className={clsx('py-3 px-2  ', {
+											'relative w-12 px-4': header.id === 'toggle',
+											'min-w-[8rem]': i === 1,
+										})}
+										key={header.id}
+										colSpan={header.colSpan}
+									>
+										{header.isPlaceholder ? null : header.renderHeader()}
+									</th>
+								))}
+								<th>
+									<IconButton
+										onClick={() => setOpen(!open)}
+										size="xs"
+										fullRounded
+										icon={<DotsHorizontalIcon />}
+										ariaLabel="settings"
+									/>
 								</th>
-							))}
-							<th>
-								<IconButton
-									onClick={() => setOpen(!open)}
-									size="xs"
-									fullRounded
-									icon={<DotsHorizontalIcon />}
-									ariaLabel="settings"
-								/>
-							</th>
-						</tr>
-					))}
-				</thead>
-				<tbody className="relative divide-y divide-accent-primary">
-					{instance.getRowModel().rows.map((row) => (
-						<tr className="" key={row.id}>
-							{row.getVisibleCells().map((cell, index) => (
+							</tr>
+						))}
+					</thead>
+					<tbody className="relative divide-y divide-accent-primary">
+						{instance.getRowModel().rows.map((row) => (
+							<tr className="" key={row.id}>
+								{row.getVisibleCells().map((cell, index) => (
+									<td
+										className={clsx(
+											'px-2 py-3 text-sm text-left  whitespace-nowrap',
+											index === 0 ? 'w-12 px-4 ' : 'w-28',
+											index === row.getVisibleCells().length - 1
+										)}
+										key={cell.id}
+									>
+										{cell.renderCell()}
+									</td>
+								))}
 								<td
 									className={clsx(
-										'px-2 py-3 text-sm text-left  whitespace-nowrap',
-										index === 0 ? 'w-12 px-4 ' : 'w-28',
-										index === row.getVisibleCells().length - 1
+										'   py-3 text-sm text-left whitespace-nowrap border-r',
+										phaseBorderColors[row.original?.phase as Phase]
 									)}
-									key={cell.id}
 								>
-									{cell.renderCell()}
+									<IconButton
+										onClick={() => setOpen(!open)}
+										size="xs"
+										fullRounded
+										icon={<ChevronRightIcon />}
+										ariaLabel="show"
+									/>
 								</td>
-							))}
-							<td
-								className={clsx(
-									'   py-3 text-sm text-left whitespace-nowrap border-r',
-									phaseBorderColors[row.original?.phase as Phase]
-								)}
-							>
-								<IconButton
-									onClick={() => setOpen(!open)}
-									size="xs"
-									fullRounded
-									icon={<ChevronRightIcon />}
-									ariaLabel="show"
-								/>
-							</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+
 			<SlideOver title="Settings" open={open} onClose={() => setOpen(false)}>
 				<ReactSortable
 					className="divide-y divide-accent-primary"
@@ -288,7 +291,7 @@ export default function OverviewTable({
 				)}
 				onChange={() => setRowSelection([])}
 			/>
-		</div>
+		</>
 	);
 }
 

@@ -69,14 +69,16 @@ export const overviewRouter = createRouter()
 				});
 
 				const overview = info.map((item) => {
+					const summedCalories = sumBy(item.nutritions, 'calories');
+
 					const mappedItem = {
 						id: item.id,
 						date: toNormalDate(item.measuredFormat, true),
 						phase: item.phase,
 						notes: item.notes,
-						calories: toFixed(sumBy(item.nutritions, 'calories'), 2),
-						weight: toFixed(item.measurements[0]?.weight, 2),
-						bodyFat: toFixed(item.measurements[0]?.bodyFat, 2),
+						calories: summedCalories > 0 ? toFixed(summedCalories) : undefined,
+						weight: toFixed(item.measurements[0]?.weight),
+						bodyFat: toFixed(item.measurements[0]?.bodyFat),
 						training: Boolean(item.workouts[0]?.duration),
 					};
 					item.completedHabits.forEach((completedHabit) => {
