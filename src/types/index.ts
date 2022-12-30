@@ -14,3 +14,8 @@ export interface OverviewData {
 	training: boolean;
 	notes: string | null;
 }
+
+export type DateRange = {
+	from?: string;
+	to?: string;
+};

@@ -5,23 +5,59 @@ import { Phase } from '@prisma/client';
 import { db } from 'lib/prisma';
 
 import { OverviewData } from 'types';
+import { toFixed } from 'utils/misc';
+import { toNormalDate } from 'utils/date';
+import { sumBy } from 'lodash';
 
 export const overviewRouter = createRouter()
 	.query('index', {
-		async resolve({ ctx: { user } }) {
+		input: z.object({
+			from: z.string().optional(),
+			to: z.string().optional(),
+		}),
+		async resolve({ input: { from, to }, ctx: { user } }) {
 			if (user) {
-				const items = (await db.$queryRaw`
-                    SELECT
-                        TO_CHAR(i."measuredFormat",'dd.MM') AS "date",
-                        phase,calories,round("weight"::numeric,2) AS "weight",
-                        round("bodyFat"::numeric,2) AS "bodyFat",
-                        (ac."workoutDuration" IS NOT NULL) AS "training",
-                        ac."workoutDuration",notes,i."id" FROM"Info" AS i
-                        LEFT JOIN(SELECT"userId","measuredFormat",SUM(calories)AS calories FROM"Nutrition" GROUP BY"measuredFormat","userId")n ON i."userId"=n."userId" AND i."measuredFormat"=n."measuredFormat"
-                         LEFT JOIN(SELECT"userId","measuredFormat","weight","bodyFat" FROM"Measurements" AS me)m ON i."userId"=m."userId" AND i."measuredFormat"=m."measuredFormat"
-                         LEFT JOIN(SELECT"userId","measuredFormat",sum(duration)AS"workoutDuration" FROM"Workouts" GROUP BY"userId","measuredFormat")ac ON i."userId"=ac."userId" AND i."measuredFormat"=ac."measuredFormat"
-                         ORDER BY i."measuredFormat" DESC;
-            `) as OverviewData[];
+				const info = await db.info.findMany({
+					include: {
+						nutritions: {
+							select: {
+								calories: true,
+							},
+						},
+						measurements: {
+							select: {
+								weight: true,
+								bodyFat: true,
+							},
+						},
+						workouts: {
+							select: {
+								duration: true,
+							},
+						},
+						activitySteps: {
+							select: {
+								steps: true,
+							},
+						},
+						completedHabits: {
+							select: {
+								habitId: true,
+								completedAt: true,
+							},
+						},
+					},
+					where: {
+						userId: user.id,
+						measuredFormat: {
+							gte: from,
+							lte: to,
+						},
+					},
+					orderBy: {
+						measuredFormat: 'desc',
+					},
+				});
 
 				const { hiddenOverviewColumns, orderOverviewColumns } = (await db.user.findUnique({
 					where: { id: user?.id },
@@ -32,27 +68,30 @@ export const overviewRouter = createRouter()
 					orderBy: { name: 'desc' },
 				});
 
-				const completedHabits = await db.completedHabits.findMany({
-					where: { habit: { userId: user.id } },
-				});
+				console.log(info);
 
-				//add habit data to items
-				items.forEach((item) => {
-					const itemCompletedHabits = completedHabits.filter((completedHabit) => {
-						return completedHabit.infoId === item.id;
+				const overview = info.map((item) => {
+					const mappedItem = {
+						id: item.id,
+						date: toNormalDate(item.measuredFormat, true),
+						phase: item.phase,
+						notes: item.notes,
+						calories: toFixed(sumBy(item.nutritions, 'calories'), 2),
+						weight: toFixed(item.measurements[0]?.weight, 2),
+						bodyFat: toFixed(item.measurements[0]?.bodyFat, 2),
+						training: Boolean(item.workouts[0]?.duration),
+					};
+					item.completedHabits.forEach((completedHabit) => {
+						const habit = habits.find((habit) => habit.id === completedHabit.habitId);
+						if (habit) {
+							// @ts-ignore
+							mappedItem[habit.id] = true;
+						}
 					});
-					if (itemCompletedHabits.length > 0) {
-						itemCompletedHabits.forEach((completedHabit) => {
-							const habit = habits.find((habit) => habit.id === completedHabit.habitId);
-							if (habit) {
-								// @ts-ignore
-								item[habit.id] = true;
-							}
-						});
-					}
+					return mappedItem as OverviewData;
 				});
 
-				return { items, hiddenOverviewColumns, orderOverviewColumns, habits };
+				return { overview, hiddenOverviewColumns, orderOverviewColumns, habits };
 			}
 		},
 	})

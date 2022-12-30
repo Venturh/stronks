@@ -2,6 +2,7 @@ import { Transition, Dialog } from '@headlessui/react';
 import { ArrowLeftIcon, XIcon } from '@heroicons/react/outline';
 import clsx from 'clsx';
 import React, { Fragment, useRef } from 'react';
+import IconButton from './IconButton';
 
 export type ModalProps = {
 	children?: React.ReactChild;
@@ -68,14 +69,7 @@ export default function Modal({
 						<div className="fixed inset-x-0 bottom-0 z-40 max-h-screen m-auto overflow-hidden rounded-lg shadow-lg dark:ring sm:max-w-lg md:top-1/2 md:bottom-auto md:-translate-y-1/2 bg-primary dark:ring-bg-secondary">
 							{closable && (
 								<div className="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
-									<button
-										type="button"
-										className="text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-										onClick={() => setOpen(false)}
-									>
-										<span className="sr-only">Close</span>
-										<XIcon className="w-6 h-6" aria-hidden="true" />
-									</button>
+									<IconButton icon={<XIcon />} onClick={() => setOpen(false)} ariaLabel="close" />
 								</div>
 							)}
 							<div className="flex flex-col justify-between flex-1 h-full p-2 md:p-4">

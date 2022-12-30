@@ -1,6 +1,4 @@
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-dayjs.extend(utc);
 import uuidByString from 'uuid-by-string';
 
 import { db } from 'lib/prisma';
@@ -75,7 +73,7 @@ export async function persistNutritionFitData(
 			};
 			const [name, amount] = value[2].stringVal!.split(', ');
 
-			const measuredAtHours = dayjs.utc(measuredAt).hour();
+			const measuredAtHours = dayjs(measuredAt).hour();
 			const category =
 				measuredAtHours < 10
 					? 'breakfast'

@@ -35,7 +35,7 @@ export default function Switch({ checked, onChange, label, description }: Props)
 					className={clsx(
 						checked ? 'bg-brand-primary' : 'bg-accent-primary',
 						{ 'sm:ml-auto': label },
-						'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-bg-primary focus:ring-brand-primary '
+						'relative inline-flex flex-shrink-0 h-[24px] w-[44px] border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-bg-primary focus:ring-brand-primary '
 					)}
 				>
 					<span className="sr-only">Use setting</span>

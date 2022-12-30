@@ -1,9 +1,7 @@
 import dayjs, { Dayjs } from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
-import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 dayjs.extend(calendar);
-dayjs.extend(utc);
 dayjs.extend(timezone);
 
 dayjs.tz.setDefault('Europe/Berlin');
@@ -32,10 +30,10 @@ export function getMonth(d: any) {
 	return month === currentMonth ? 'current' : month === lastMonth ? 'last' : month;
 }
 
-export function toNormalDate(to?: Date) {
+export function toNormalDate(to?: Date, excludeYear?: boolean) {
 	if (!to) return '';
-	return dayjs(to).utc().format('DD.MM.YY');
+	return dayjs(to).format(excludeYear ? 'DD.MM' : 'DD.MM.YY');
 }
 export function toNormalDateTime(to: Date) {
-	return dayjs(to).utc().format('DD.MM.YY, HH:mm');
+	return dayjs(to).format('DD.MM.YY, HH:mm');
 }

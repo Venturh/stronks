@@ -23,6 +23,7 @@ import { mappedShortPhases, phaseBorderColors, phaseColors } from 'utils/phase';
 
 import { OverviewData } from 'types';
 import { ChevronRightIcon } from '@heroicons/react/outline';
+import Switch from 'components/ui/Switch';
 
 type Props = {
 	items: OverviewData[];
@@ -169,12 +170,12 @@ export default function OverviewTable({
 	}
 
 	return (
-		<>
-			<table className="relative min-w-full overflow-x-scroll divide-y shadow table-fixed divide-accent-primary ring-1 bg-secondary ring-accent-primary md:rounded-lg">
+		<div className="overflow-x-auto ">
+			<table className="relative divide-y shadow table-fixed divide-accent-primary ring-1 bg-secondary ring-accent-primary md:rounded-lg">
 				<thead>
 					{instance.getHeaderGroups().map((headerGroup) => (
 						<tr
-							className="sticky z-10 font-medium tracking-wider text-left uppercase top-14 bg-secondary text-xxs text-primary"
+							className="font-medium tracking-wider text-left uppercase top-14 bg-secondary text-xxs text-primary"
 							key={headerGroup.id}
 						>
 							{headerGroup.headers.map((header, i) => (
@@ -263,17 +264,12 @@ export default function OverviewTable({
 												{habits.find((h) => h.id === id)?.name || id}
 											</span>
 										</div>
-										<IconButton
-											onClick={async () => {
-												await editColumVisibility(id as string, !visible);
+										<Switch
+											checked={visible}
+											onChange={async () => {
 												instance.getColumn(id as string).toggleVisibility(!visible);
+												await editColumVisibility(id as string, !visible);
 											}}
-											className={clsx({ 'opacity-50': !visible })}
-											size="xs"
-											variant="ghost"
-											color="primary"
-											icon={<EyeIcon />}
-											ariaLabel="show"
 										/>
 									</div>
 								</div>
@@ -292,7 +288,7 @@ export default function OverviewTable({
 				)}
 				onChange={() => setRowSelection([])}
 			/>
-		</>
+		</div>
 	);
 }
 
