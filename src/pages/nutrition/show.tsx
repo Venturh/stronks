@@ -43,7 +43,6 @@ export default function Home() {
 		<AppLayout
 			title="Nutrition"
 			actions={<Button onClick={() => setShowStoreModal(true)}>Add</Button>}
-			small
 		>
 			<div className="space-y-4">
 				<NutritionComposer now open={showStoreModal} close={() => setShowStoreModal(false)} />

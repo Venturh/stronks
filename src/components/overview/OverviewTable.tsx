@@ -179,15 +179,8 @@ export default function OverviewTable({
 								className="sticky top-0 z-10 font-medium tracking-wider text-left uppercase bg-secondary text-xxs text-primary"
 								key={headerGroup.id}
 							>
-								{headerGroup.headers.map((header, i) => (
-									<th
-										className={clsx('py-3 px-2  ', {
-											'relative w-12 px-4': header.id === 'toggle',
-											'min-w-[8rem]': i === 1,
-										})}
-										key={header.id}
-										colSpan={header.colSpan}
-									>
+								{headerGroup.headers.map((header) => (
+									<th className="px-2 py-3" key={header.id} colSpan={header.colSpan}>
 										{header.isPlaceholder ? null : header.renderHeader()}
 									</th>
 								))}
@@ -210,7 +203,6 @@ export default function OverviewTable({
 									<td
 										className={clsx(
 											'px-2 py-3 text-sm text-left  whitespace-nowrap',
-											index === 0 ? 'w-12 px-4 ' : 'w-28',
 											index === row.getVisibleCells().length - 1
 										)}
 										key={cell.id}

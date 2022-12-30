@@ -33,7 +33,6 @@ export default function Home() {
 			title="Nutrition"
 			actions={<Button onClick={() => setShowStoreModal(true)}>Add</Button>}
 			secondaryActions={<Tabs activeIndex={selectedTab} items={tabs} />}
-			small
 		>
 			<NutritionComposer open={showStoreModal} close={() => setShowStoreModal(false)} />
 			{/* @ts-expect-error yep */}

@@ -56,7 +56,6 @@ export default function Weights() {
 			title="Measurments"
 			actions={<Tabs items={typeTabs} maxWidth="max-w-[120px] md:max-w-[180px]" />}
 			secondaryActions={<Tabs activeIndex={selectedTab} items={tabs} />}
-			small
 		>
 			{/* @ts-expect-error yep */}
 			<div ref={(el) => (dateRefs.current[0] = el)}>

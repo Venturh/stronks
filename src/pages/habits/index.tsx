@@ -19,7 +19,6 @@ export default function Habits() {
 		<AppLayout
 			title="Habits"
 			actions={<Button onClick={() => setShowStoreModal(true)}>New habit</Button>}
-			small
 		>
 			<StackedList grouped>
 				{Object.entries(data?.groupedHabits ?? {})?.map(([category, habits], i) => {

@@ -17,11 +17,7 @@ export default function Workouts() {
 	const { dateRefs, tabs, selectedTab } = useThingy(data?.items);
 
 	return (
-		<AppLayout
-			title="Workouts"
-			secondaryActions={<Tabs activeIndex={selectedTab} items={tabs} />}
-			small
-		>
+		<AppLayout title="Workouts" secondaryActions={<Tabs activeIndex={selectedTab} items={tabs} />}>
 			{/* @ts-expect-error yep */}
 			<div ref={(el) => (dateRefs.current[0] = el)}>
 				<WeekTrackCard
