@@ -42,7 +42,7 @@ export async function getDatasetDataPerInterval(
 export async function getDatasetData(accessToken: string, dataSourceId: string, userId: string) {
 	let startTime = dayjs().subtract(1, 'year').startOf('day').unix() * 1000000000;
 
-	const latestData = await db.nutrition.findFirst({
+	const latestData = await db.info.findFirst({
 		where: {
 			userId,
 		},
@@ -77,7 +77,7 @@ async function getAggregatedDataPerInterval(
 	const endTime = dayjs(startTime).add(2, 'months').endOf('day').unix() * 1000;
 	const todayEndTime = dayjs().endOf('day').unix() * 1000;
 
-	if (endTime > todayEndTime) {
+	if (startTime > todayEndTime) {
 		return {
 			bucket: [],
 		};
@@ -125,7 +125,7 @@ export async function getAggregatedData(
 	let startTime = dayjs().subtract(1, 'year').startOf('day').unix() * 1000;
 
 	//@ts-ignore
-	const latestData = await db[type].findFirst({
+	const latestData = await db.info.findFirst({
 		where: {
 			userId,
 		},
