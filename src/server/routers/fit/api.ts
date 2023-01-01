@@ -22,14 +22,11 @@ export async function getDatasetDataPerInterval(
 	dataSourceId: string,
 	startTime: number
 ) {
-	const endTime =
-		dayjs(startTime / 1000000)
-			.add(2, 'months')
-			.endOf('day')
-			.unix() * 1000000000;
+	const endTimeNs = dayjs(startTime).add(2, 'months').endOf('day').valueOf() * 1000000;
+	const startNs = dayjs(startTime).startOf('day').valueOf() * 1000000;
 
 	const { data }: AxiosResponse<DataSourceResponse> = await axios.get(
-		`https://www.googleapis.com/fitness/v1/users/me/dataSources/${dataSourceId}/datasets/${endTime}-${startTime}`,
+		`https://www.googleapis.com/fitness/v1/users/me/dataSources/${dataSourceId}/datasets/${endTimeNs}-${startNs}`,
 		{
 			headers: {
 				Authorization: `Bearer ${accessToken}`,
@@ -40,7 +37,7 @@ export async function getDatasetDataPerInterval(
 	return data;
 }
 export async function getDatasetData(accessToken: string, dataSourceId: string, userId: string) {
-	let startTime = dayjs().subtract(1, 'year').startOf('day').unix() * 1000000000;
+	let startTime = dayjs().subtract(1, 'year').startOf('day').unix() * 1000;
 
 	const latestData = await db.nutrition.findFirst({
 		where: {
@@ -52,17 +49,17 @@ export async function getDatasetData(accessToken: string, dataSourceId: string, 
 	});
 
 	if (latestData) {
-		startTime = dayjs(latestData.measuredFormat).startOf('day').unix() * 1000000000;
+		startTime = dayjs(latestData.measuredFormat).startOf('day').unix() * 1000;
 	}
 
 	const data: DataSourceResponse = { point: [], dataSourceId };
 
 	do {
 		const newData = await getDatasetDataPerInterval(accessToken, dataSourceId, startTime);
-		startTime = Number(newData?.maxEndTimeNs);
-		if (!newData?.maxEndTimeNs || startTime > dayjs().endOf('day').unix() * 1000000000) {
+		if (!newData?.maxEndTimeNs || startTime > dayjs().endOf('day').unix() * 1000) {
 			break;
 		}
+		startTime = dayjs(startTime).add(2, 'months').endOf('day').unix() * 1000;
 		data.point.push(...newData.point);
 	} while (true);
 	return data;
@@ -77,8 +74,6 @@ async function getAggregatedDataPerInterval(
 ): Promise<AggregatedDataSourceResponse> {
 	const endTime = dayjs(startTime).add(2, 'months').endOf('day').unix() * 1000;
 	const todayEndTime = dayjs().endOf('day').unix() * 1000;
-
-	console.log('startTime', startTime, endTime, todayEndTime, startTime > todayEndTime);
 
 	if (startTime === prevStartTime || startTime > todayEndTime) {
 		return {

@@ -8,6 +8,7 @@ export type DataSourceResponse = {
 			fpVal?: string | number;
 			mapVal?: { key: string; value: { fpVal?: string | number } }[];
 			stringVal?: string;
+			intVal?: number;
 		}[];
 	}[];
 };
