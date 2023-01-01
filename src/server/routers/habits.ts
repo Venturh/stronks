@@ -86,10 +86,28 @@ export const habitsRouter = createRouter()
 	})
 	.mutation('complete', {
 		input: completeHabitSchema,
-		async resolve({ input: { habitId } }) {
-			const habit = await db.completedHabits.create({
-				data: { habitId, completedAt: new Date() },
+		async resolve({ input: { habitId, infoId } }) {
+			const completedHabit = await db.completedHabits.findFirst({
+				where: {
+					habitId,
+					infoId,
+				},
 			});
-			return habit;
+
+			if (completedHabit) {
+				return await db.completedHabits.delete({
+					where: {
+						id: completedHabit.id,
+					},
+				});
+			}
+
+			return await db.completedHabits.create({
+				data: {
+					habitId,
+					completedAt: new Date(),
+					infoId,
+				},
+			});
 		},
 	});

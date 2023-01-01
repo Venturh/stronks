@@ -139,6 +139,7 @@ const createOptions = (req: NextApiRequest): NextAuthOptions => ({
 					hiddenOverviewColumns: [],
 					orderOverviewColumns: [
 						'date',
+						'mood',
 						'phase',
 						'calories',
 						'weight',

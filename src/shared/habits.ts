@@ -13,6 +13,7 @@ export const updateHabitSchema = createHabitSchema.extend({
 
 export const completeHabitSchema = z.object({
 	habitId: z.string(),
+	infoId: z.string(),
 });
 
 export const mappedHabitCategories = {

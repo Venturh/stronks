@@ -102,7 +102,7 @@ export const overviewRouter = createRouter()
 		input: z.object({
 			id: z.string(),
 		}),
-		async resolve({ input: { id } }) {
+		async resolve({ input: { id }, ctx: { user } }) {
 			const info = await db.info.findUnique({
 				where: { id },
 				include: {
@@ -135,7 +135,21 @@ export const overviewRouter = createRouter()
 					},
 				},
 			});
-			return info;
+
+			if (info) {
+				const aggregatedInfo = { ...info, calories: sumBy(info.nutritions, 'calories') };
+				Object.assign(aggregatedInfo, {
+					mood: info.mood ?? '?',
+				});
+
+				const habits = await db.habits.findMany({
+					where: { userId: user?.id },
+					orderBy: { name: 'desc' },
+				});
+				return { info: aggregatedInfo, habits };
+			}
+
+			return { info: undefined, habits: undefined };
 		},
 	})
 

@@ -39,7 +39,7 @@ export default function Tabs({ activeIndex, items, maxWidth }: Props) {
 	return (
 		<nav
 			className={clsx(
-				'relative w-full overflow-x-scroll rounded-md ring-1 bg-secondary ring-accent-primary',
+				'relative w-full overflow-x-auto rounded-md ring-1 bg-secondary ring-accent-primary',
 				maxWidth ?? 'max-w-xl'
 			)}
 		>
