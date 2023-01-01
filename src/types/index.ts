@@ -1,4 +1,4 @@
-import { Phase } from '@prisma/client';
+import { Mood, Phase } from '@prisma/client';
 
 export type WithOutIdAndTimestamps<T> = Omit<T, 'id' | 'createdAt' | 'updatedAt'>;
 
@@ -7,6 +7,8 @@ export interface OverviewData {
 
 	id: string;
 	date: string;
+	fullDate: string;
+	mood: Mood;
 	phase: Phase;
 	calories: string | null;
 	weight: string | null;

@@ -5,10 +5,10 @@ import clsx from 'clsx';
 import Button, { Color } from 'components/ui/Button';
 import Badge from './Badge';
 
-type SelectItem = { label: string; value: string; disabled?: boolean };
+type SelectItem = { label: string; value?: string | number | null; disabled?: boolean };
 
 type Props = {
-	value: string;
+	value?: string;
 	label?: string;
 	items: SelectItem[];
 	badge?: boolean;
@@ -28,16 +28,16 @@ export default function Select({
 }: Props) {
 	return (
 		<SelectPrimitive.Root value={value} onValueChange={onChange}>
-			<SelectPrimitive.Trigger className="" asChild aria-label="Select">
+			<SelectPrimitive.Trigger asChild aria-label="Select">
 				{badge ? (
 					<button>
 						<Badge color={color} variant={variant}>
-							<SelectPrimitive.Value />
+							<SelectPrimitive.Value placeholder="Choose" />
 						</Badge>
 					</button>
 				) : (
 					<Button label={label} size="sm" color={color} rightIcon={<ChevronDownIcon />}>
-						<SelectPrimitive.Value />
+						<SelectPrimitive.Value placeholder="Choose" />
 					</Button>
 				)}
 			</SelectPrimitive.Trigger>
@@ -45,7 +45,7 @@ export default function Select({
 				<SelectPrimitive.ScrollUpButton className="flex items-center justify-center text-primary">
 					<ChevronUpIcon />
 				</SelectPrimitive.ScrollUpButton>
-				<SelectPrimitive.Viewport className="p-2 rounded-lg shadow-lg bg-secondary ring-1 ring-accent-primary ">
+				<SelectPrimitive.Viewport className="p-2 rounded-lg shadow-lg bg-secondary ring-1 ring-accent-primary">
 					<SelectPrimitive.Group>
 						{items.map(({ label, value, disabled }, i) => (
 							<SelectPrimitive.Item
@@ -53,7 +53,7 @@ export default function Select({
 								key={`${value}-${i}`}
 								value={value}
 								className={clsx(
-									'relative flex items-center text-left py-2 px-3 rounded-md text-sm text-primary font-medium focus:bg-accent-primary',
+									'relative flex items-center text-left p-2  rounded-md  text-primary font-medium focus:bg-accent-primary',
 									'radix-disabled:opacity-50',
 									'focus:outline-none select-none'
 								)}

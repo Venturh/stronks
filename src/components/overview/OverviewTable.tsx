@@ -7,9 +7,9 @@ import {
 	useTableInstance,
 	VisibilityState,
 } from '@tanstack/react-table';
-import { Habits, Phase } from '@prisma/client';
+import { Habits, Mood, Phase } from '@prisma/client';
 import { ItemInterface, ReactSortable } from 'react-sortablejs';
-import { DotsHorizontalIcon, EyeIcon, MenuIcon } from '@heroicons/react/solid';
+import { DotsHorizontalIcon, MenuIcon } from '@heroicons/react/solid';
 
 import Select from 'components/ui/Select';
 import IconButton from 'components/ui/IconButton';
@@ -24,6 +24,7 @@ import { mappedShortPhases, phaseBorderColors, phaseColors } from 'utils/phase';
 import { OverviewData } from 'types';
 import { ChevronRightIcon } from '@heroicons/react/outline';
 import Switch from 'components/ui/Switch';
+import { mappedMoods } from 'utils/mood';
 
 type Props = {
 	items: OverviewData[];
@@ -54,6 +55,9 @@ const defaultColumns = [
 	}),
 	table.createDataColumn('date', {
 		cell: (info) => info.getValue(),
+	}),
+	table.createDataColumn('mood', {
+		cell: ({ cell }) => <MoodCell {...cell} />,
 	}),
 	table.createDataColumn('phase', {
 		header: () => 'Phase',
@@ -217,7 +221,7 @@ export default function OverviewTable({
 									)}
 								>
 									<IconButton
-										onClick={() => setOpen(!open)}
+										href={`/overview/${row.original?.id}`}
 										size="xs"
 										fullRounded
 										icon={<ChevronRightIcon />}
@@ -288,9 +292,7 @@ export default function OverviewTable({
 }
 
 function PhaseCell({ row, getValue }: { row: any; getValue: () => any }) {
-	const update = trpc.useMutation('overview.update', {
-		onSuccess: () => trpc.useContext().invalidateQueries('overview.index'),
-	});
+	const update = trpc.useMutation('overview.update', {});
 
 	const infoId = row.original!.id;
 	const initalValue = getValue();
@@ -310,6 +312,28 @@ function PhaseCell({ row, getValue }: { row: any; getValue: () => any }) {
 			badge
 			variant="subtle"
 			color={phaseColors[value]}
+		/>
+	);
+}
+function MoodCell({ row, getValue }: { row: any; getValue: () => any }) {
+	const update = trpc.useMutation('overview.update');
+
+	const infoId = row.original!.id;
+	const initalValue = getValue();
+	const [value, setValue] = useState<Mood>(initalValue);
+	return (
+		<Select
+			onChange={async (mood) => {
+				setValue(mood as Mood);
+				await update.mutateAsync({
+					mood: mood as Mood,
+					infoId,
+				});
+			}}
+			badge
+			value={value}
+			items={mappedMoods}
+			variant="subtle"
 		/>
 	);
 }

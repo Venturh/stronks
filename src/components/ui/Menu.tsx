@@ -8,7 +8,7 @@ import useIsMobile from 'hooks/useMobile';
 
 export type MenuItem = {
 	text: string;
-	value?: string | boolean | number;
+	value?: string | boolean | number | null;
 	to?: string;
 	checked?: boolean;
 	active?: boolean;

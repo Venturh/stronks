@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { createRouter } from 'server/createRouter';
-import { Phase } from '@prisma/client';
+import { Mood, Phase } from '@prisma/client';
 
 import { db } from 'lib/prisma';
 
@@ -8,6 +8,7 @@ import { OverviewData } from 'types';
 import { toFixed } from 'utils/misc';
 import { toNormalDate } from 'utils/date';
 import { sumBy } from 'lodash';
+import dayjs from 'dayjs';
 
 export const overviewRouter = createRouter()
 	.query('index', {
@@ -50,8 +51,8 @@ export const overviewRouter = createRouter()
 					where: {
 						userId: user.id,
 						measuredFormat: {
-							gte: from,
-							lte: to,
+							gte: from ?? dayjs().subtract(3, 'month').toISOString(),
+							lte: to ?? dayjs().toISOString(),
 						},
 					},
 					orderBy: {
@@ -74,8 +75,10 @@ export const overviewRouter = createRouter()
 					const mappedItem = {
 						id: item.id,
 						date: toNormalDate(item.measuredFormat, true),
-						phase: item.phase,
-						notes: item.notes,
+						fullDate: toNormalDate(item.measuredFormat),
+						phase: item.phase ?? null,
+						notes: item.notes ?? null,
+						mood: item.mood ?? null,
 						calories: summedCalories > 0 ? toFixed(summedCalories) : undefined,
 						weight: toFixed(item.measurements[0]?.weight),
 						bodyFat: toFixed(item.measurements[0]?.bodyFat),
@@ -95,19 +98,62 @@ export const overviewRouter = createRouter()
 			}
 		},
 	})
+	.query('show', {
+		input: z.object({
+			id: z.string(),
+		}),
+		async resolve({ input: { id } }) {
+			const info = await db.info.findUnique({
+				where: { id },
+				include: {
+					nutritions: {
+						select: {
+							calories: true,
+						},
+					},
+					measurements: {
+						select: {
+							weight: true,
+							bodyFat: true,
+						},
+					},
+					workouts: {
+						select: {
+							duration: true,
+						},
+					},
+					activitySteps: {
+						select: {
+							steps: true,
+						},
+					},
+					completedHabits: {
+						select: {
+							habitId: true,
+							completedAt: true,
+						},
+					},
+				},
+			});
+			return info;
+		},
+	})
+
 	.mutation('update', {
 		input: z.object({
 			infoId: z.string(),
 			phase: z.nativeEnum(Phase).optional(),
 			notes: z.string().optional(),
 			habitId: z.string().optional(),
+			mood: z.nativeEnum(Mood).optional(),
 		}),
-		async resolve({ input: { phase, notes, infoId, habitId } }) {
+		async resolve({ input: { phase, notes, infoId, habitId, mood } }) {
 			const info = await db.info.update({
 				where: { id: infoId },
 				data: {
 					phase,
 					notes,
+					mood,
 				},
 			});
 

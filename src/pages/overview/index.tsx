@@ -32,7 +32,13 @@ export default function Overview() {
 			actions={
 				<div className="flex items-center space-x-2">
 					<div>
-						<DatePicker startDate={startDate} endDate={endDate} onDateChange={onDateChange} range />
+						<DatePicker
+							placeholder="Latest 3 months"
+							startDate={startDate}
+							endDate={endDate}
+							onDateChange={onDateChange}
+							range
+						/>
 					</div>
 					<Button className="ml-2" loading={sync!.isLoading} onClick={() => sync.mutateAsync()}>
 						Sync

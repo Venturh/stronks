@@ -7,12 +7,12 @@ export function useDatePicker() {
 
 	const { from, to } = query as DateRange;
 
-	const [startDate, setStartDate] = useState<Date>();
-	const [endDate, setEndDate] = useState<Date>();
+	const [startDate, setStartDate] = useState<Date | undefined>();
+	const [endDate, setEndDate] = useState<Date | undefined>();
 
 	useEffect(() => {
-		setStartDate(from && from !== '' ? new Date(from) : undefined);
-		setEndDate(to && to !== '' ? new Date(to) : undefined);
+		if (from) setStartDate(from && from !== '' ? new Date(from) : undefined);
+		if (to) setEndDate(to && to !== '' ? new Date(to) : undefined);
 	}, [from, to]);
 
 	function onDateChange(from?: Date, to?: Date) {

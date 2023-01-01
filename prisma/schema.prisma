@@ -166,17 +166,27 @@ model ActivitySteps {
     info           Info?    @relation(fields: [infoId], references: [id])
 }
 
+enum Mood {
+    SUPER
+    GOOD
+    OK
+    BAD
+    TERRIBLE
+}
+
+
 model Info {
     id             String          @id @default(uuid())
     measuredFormat DateTime        @unique
     phase          Phase?          @default(MAINTAIN)
     notes          String?
     userId         String
+    mood           Mood?
     measurements   Measurements[]
     nutritions     Nutrition[]
     workouts       Workouts[]
     activitySteps  ActivitySteps[]
-    completedHabits     CompletedHabits[]
+    completedHabits  CompletedHabits[]
     user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 

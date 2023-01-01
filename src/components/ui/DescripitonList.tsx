@@ -2,7 +2,7 @@ import Button, { ButtonProps } from './Button';
 
 type Props = {
 	title: string;
-	description: string;
+	description?: string;
 	children: React.ReactNode;
 	action?: ButtonProps & { onClick: () => void };
 };
@@ -13,7 +13,7 @@ export function DescriptionList({ title, description, action, children }: Props)
 			<div className="flex items-center justify-between">
 				<div className="space-y-1">
 					<h3 className="text-lg font-medium leading-6 text-primary">{title}</h3>
-					<p className="max-w-2xl text-sm text-secondary">{description}</p>
+					{description && <p className="max-w-2xl text-sm text-secondary">{description}</p>}
 				</div>
 				{action && (
 					<Button className="ml-2" loading={action!.loading} onClick={() => action.onClick()}>
