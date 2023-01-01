@@ -78,7 +78,7 @@ export const overviewRouter = createRouter()
 						fullDate: toNormalDate(item.measuredFormat),
 						phase: item.phase ?? null,
 						notes: item.notes ?? null,
-						mood: item.mood ?? null,
+						mood: item.mood ?? '?',
 						calories: summedCalories > 0 ? toFixed(summedCalories) : undefined,
 						weight: toFixed(item.measurements[0]?.weight),
 						bodyFat: toFixed(item.measurements[0]?.bodyFat),

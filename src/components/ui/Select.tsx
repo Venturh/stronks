@@ -5,10 +5,10 @@ import clsx from 'clsx';
 import Button, { Color } from 'components/ui/Button';
 import Badge from './Badge';
 
-type SelectItem = { label: string; value?: string | number | null; disabled?: boolean };
+type SelectItem = { label: string; value: string; disabled?: boolean };
 
 type Props = {
-	value?: string;
+	value: string;
 	label?: string;
 	items: SelectItem[];
 	badge?: boolean;

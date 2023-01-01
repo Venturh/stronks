@@ -6,5 +6,5 @@ export const mappedMoods = [
 	{ label: '😑', value: Mood.OK },
 	{ label: '😞', value: Mood.BAD },
 	{ label: '😖', value: Mood.TERRIBLE },
-	{ label: '?', value: null },
+	{ label: '?', value: '?' },
 ];
