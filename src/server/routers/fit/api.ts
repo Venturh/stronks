@@ -42,7 +42,7 @@ export async function getDatasetDataPerInterval(
 export async function getDatasetData(accessToken: string, dataSourceId: string, userId: string) {
 	let startTime = dayjs().subtract(1, 'year').startOf('day').unix() * 1000000000;
 
-	const latestData = await db.info.findFirst({
+	const latestData = await db.nutrition.findFirst({
 		where: {
 			userId,
 		},
@@ -72,12 +72,15 @@ async function getAggregatedDataPerInterval(
 	accessToken: string,
 	dataTypeNames: string[],
 	aggregation: 'bucketBySession' | 'bucketByActivitySegment' | 'bucketByTime' = 'bucketByTime',
-	startTime: number
+	startTime: number,
+	prevStartTime?: number
 ): Promise<AggregatedDataSourceResponse> {
 	const endTime = dayjs(startTime).add(2, 'months').endOf('day').unix() * 1000;
 	const todayEndTime = dayjs().endOf('day').unix() * 1000;
 
-	if (startTime > todayEndTime) {
+	console.log('startTime', startTime, endTime, todayEndTime, startTime > todayEndTime);
+
+	if (startTime === prevStartTime || startTime > todayEndTime) {
 		return {
 			bucket: [],
 		};
@@ -125,7 +128,7 @@ export async function getAggregatedData(
 	let startTime = dayjs().subtract(1, 'year').startOf('day').unix() * 1000;
 
 	//@ts-ignore
-	const latestData = await db.info.findFirst({
+	const latestData = await db[type].findFirst({
 		where: {
 			userId,
 		},
@@ -139,16 +142,19 @@ export async function getAggregatedData(
 	}
 
 	const data: AggregatedDataSourceResponse = { bucket: [] };
-
+	let prevStartTime = 0;
 	do {
 		const newData = await getAggregatedDataPerInterval(
 			accessToken,
 			dataTypeNames,
 			aggregation,
-			startTime
+			startTime,
+			prevStartTime
 		);
 		if (newData.bucket.length === 0) break;
+		prevStartTime = startTime;
 		startTime = Number(newData.bucket[newData.bucket.length - 1].startTimeMillis);
+
 		data.bucket.push(...newData.bucket);
 	} while (data.bucket.length !== 0);
 	return data;
