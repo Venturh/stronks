@@ -5,6 +5,7 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter';
 
 import { db } from 'lib/prisma';
 import { Account, User } from '@prisma/client';
+import dayjs from 'dayjs';
 
 export interface NextAuthUserWithStringId extends NextAuthUser {
 	id: string;
@@ -34,21 +35,20 @@ async function refreshAccessToken(account: Account) {
 			throw new Error(data.error_description);
 		}
 
-		const expires_at = Date.now() + data.expires_in * 1000;
-
-		await db.account.update({
-			where: {
-				id: account.id,
-			},
-			data: {
-				access_token: data.access_token,
-				refresh_token: data.refresh_token ?? account.refresh_token,
-				refresh_token_expires_in: data.refresh_token_expires_in,
-				expires_at,
-				token_type: data.token_type,
-				scope: data.scope,
-			},
-		});
+		const expires_at = dayjs().add(data.expires_in, 'seconds').unix();
+		try {
+			await db.account.update({
+				where: {
+					id: account.id,
+				},
+				data: {
+					access_token: data.access_token,
+					expires_at,
+				},
+			});
+		} catch (error) {
+			console.log('acc', error);
+		}
 
 		return { expires_at };
 	} catch (error) {
@@ -109,9 +109,8 @@ const createOptions = (req: NextApiRequest): NextAuthOptions => ({
 
 			if (account) {
 				const accessTokenExpires = account.expires_at ?? 0;
-				// convert to milliseconds for check
+
 				if (Date.now() > accessTokenExpires * 1000) {
-					// return session;
 					const { expires_at } = await refreshAccessToken(account);
 					session.expires_at = expires_at!;
 				}
