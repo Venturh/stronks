@@ -9,6 +9,8 @@ import { toFixed } from 'utils/misc';
 import { toNormalDate } from 'utils/date';
 import { sumBy } from 'lodash';
 import dayjs from 'dayjs';
+import { updateOverviewSchema } from 'shared/overview';
+import { makeApiUuid } from './fit/utils';
 
 export const overviewRouter = createRouter()
 	.query('index', {
@@ -154,14 +156,8 @@ export const overviewRouter = createRouter()
 	})
 
 	.mutation('update', {
-		input: z.object({
-			infoId: z.string(),
-			phase: z.nativeEnum(Phase).optional(),
-			notes: z.string().optional(),
-			habitId: z.string().optional(),
-			mood: z.nativeEnum(Mood).optional(),
-		}),
-		async resolve({ input: { phase, notes, infoId, habitId, mood } }) {
+		input: updateOverviewSchema,
+		async resolve({ input: { phase, notes, infoId, habitId, mood, weight, bodyFat } }) {
 			const info = await db.info.update({
 				where: { id: infoId },
 				data: {
@@ -194,6 +190,28 @@ export const overviewRouter = createRouter()
 						},
 					});
 				}
+			}
+
+			console.log('weight', weight);
+			if (weight || bodyFat) {
+				await db.measurements.upsert({
+					where: {
+						measuredFormat: info.measuredFormat,
+					},
+					create: {
+						weight,
+						bodyFat,
+						measuredFormat: info.measuredFormat,
+						objectId: makeApiUuid([info.measuredFormat.toString()]),
+						measuredAt: new Date(),
+						infoId: info.id,
+						userId: info.userId,
+					},
+					update: {
+						weight,
+						bodyFat,
+					},
+				});
 			}
 
 			return info;

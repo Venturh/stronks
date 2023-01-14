@@ -24,6 +24,8 @@ export default function Home() {
 	const { data, error } = trpc.useQuery(['nutrition.show', { category, measuredFormat: date }]);
 	const removeMutation = trpc.useMutation(['nutrition.delete']);
 
+	console.log(data);
+
 	if (error) {
 		return <NextError statusCode={404} />;
 	}
@@ -48,44 +50,41 @@ export default function Home() {
 				<NutritionComposer now open={showStoreModal} close={() => setShowStoreModal(false)} />
 				<StackedList grouped>
 					<StackedListHeader primary={category} seconary="Carbs  •  Protein  •  Fat">
-						{data?.map(
-							({ name, amount, calories, carbohydrates, protein, fat, id, synced }, idx) => (
-								<StackedListItem
-									key={idx}
-									primary={`${amount} ${name}`}
-									secondary={`${calories} kcal`}
-									tertiary={`${toFixed(carbohydrates)}g • ${toFixed(protein)}g • ${toFixed(fat)}g`}
-									quaternary={
-										!synced && (
-											<IconButton
-												ariaLabel="destroy"
-												loading={removeMutation.isLoading}
-												fullRounded
-												size="xxs"
-												color="secondary"
-												icon={<XIcon />}
-												onClick={async () =>
-													await removeMutation.mutateAsync(
-														{ id },
-														{
-															onSuccess: () =>
-																utils.invalidateQueries([
-																	'nutrition.show',
-																	{ category, measuredFormat: date },
-																]),
-														}
-													)
+						{data?.map(({ name, amount, calories, carbohydrates, protein, fat, id }, idx) => (
+							<StackedListItem
+								key={idx}
+								primary={`${amount ?? ''} ${name}`}
+								secondary={`${toFixed(calories, 0, 0)} kcal`}
+								tertiary={`${toFixed(carbohydrates)}g • ${toFixed(protein)}g • ${toFixed(fat)}g`}
+								quaternary={
+									<IconButton
+										variant="ghost"
+										ariaLabel="destroy"
+										loading={removeMutation.isLoading}
+										fullRounded
+										size="xs"
+										color="error"
+										icon={<XIcon />}
+										onClick={async () =>
+											await removeMutation.mutateAsync(
+												{ id },
+												{
+													onSuccess: () =>
+														utils.invalidateQueries([
+															'nutrition.show',
+															{ category, measuredFormat: date },
+														]),
 												}
-											/>
-										)
-									}
-								/>
-							)
-						)}
+											)
+										}
+									/>
+								}
+							/>
+						))}
 					</StackedListHeader>
 				</StackedList>
 				<Card
-					main={`${summary?.calories} kcal`}
+					main={`${toFixed(summary?.calories, 0, 0)} kcal`}
 					second={`Carbs: ${toFixed(summary?.carbohydrates)}g •  Protein: ${toFixed(
 						summary?.protein
 					)}g • Fat: ${toFixed(summary?.fat)}g`}

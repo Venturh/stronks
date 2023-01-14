@@ -8,6 +8,7 @@ interface Props extends ComponentProps<'input'> {
 	trailingText?: string;
 	leadingText?: string;
 	as?: 'input' | 'textarea';
+	borderless?: boolean;
 	withError?: boolean;
 	valueAsNumber?: boolean;
 }
@@ -52,14 +53,16 @@ export const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>(
 			className,
 			withError = false,
 			type = 'text',
-			valueAsNumber,
+			borderless = false,
 			...rest
 		},
 		ref
 	) => {
 		const Tag = as;
-		const wrapperClass =
-			'w-full px-4 py-1 rounded-lg disabled:bg-opacity-20 focus-within:border-brand-primary focus:ring-none focus:border-none disabled:opacity-60 disabled:bg-accent-primary border border-accent-primary border bg-secondary text-primary';
+		const wrapperClass = clsx(
+			'w-full py-1 rounded-lg disabled:bg-opacity-20 focus-within:border-brand-primary focus:ring-none focus:border-none disabled:opacity-60 disabled:bg-accent-primary bg-secondary text-primary',
+			!borderless ? 'border border-accent-primary px-4' : 'border-none p-0 focus:ring-0'
+		);
 
 		return (
 			<div className={clsx(inset ? wrapperClass : undefined, className)}>
@@ -68,7 +71,7 @@ export const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>(
 						{label}
 					</label>
 				)}
-				<div className="relative mt-1 rounded-lg shadow-sm">
+				<div className="relative flex mt-1 rounded-lg shadow-sm">
 					{leadingText && (
 						<div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
 							<span className="sm:text-sm text-secondary">{leadingText}</span>
@@ -77,7 +80,7 @@ export const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>(
 					<Tag
 						className={clsx(
 							inset
-								? 'h-full resize-none block p-0 w-full border-0 focus:ring-0 sm:text-sm bg-secondary placeholder-accent-primary'
+								? 'resize-none border-0 focus:ring-0 sm:text-sm bg-secondary placeholder-accent-primary'
 								: wrapperClass,
 							{ 'pl-7': leadingText },
 							{ 'pr-7': trailingText }
@@ -89,10 +92,8 @@ export const Input = forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>(
 						{...rest}
 					/>
 					{trailingText && (
-						<div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-							<span className="sm:text-sm text-secondary" id="price-currency">
-								{trailingText}
-							</span>
+						<div className="relative inline-flex items-center text-sm font-medium text-secondary">
+							{trailingText}
 						</div>
 					)}
 				</div>

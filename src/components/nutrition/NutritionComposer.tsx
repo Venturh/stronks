@@ -79,10 +79,10 @@ export default function NutritionComposer({ open, close, now = false }: Props) {
 						label="Category"
 						placeholder="Choose category"
 						items={[
-							{ text: 'Breakfast', value: 'breakfast' },
-							{ text: 'Lunch', value: 'lunch' },
-							{ text: 'Dinner', value: 'dinner' },
-							{ text: 'Snack', value: 'snack' },
+							{ label: 'Breakfast', value: 'breakfast' },
+							{ label: 'Lunch', value: 'lunch' },
+							{ label: 'Dinner', value: 'dinner' },
+							{ label: 'Snack', value: 'snack' },
 						]}
 						{...form.register('category')}
 					/>

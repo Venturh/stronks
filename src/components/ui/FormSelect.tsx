@@ -18,6 +18,7 @@ interface Props extends UseControllerProps {
 	variant?: Variant;
 	multiple?: boolean;
 	withError?: boolean;
+	className?: string;
 }
 const FormSelect = forwardRef<HTMLSelectElement, Props>(
 	(
@@ -83,7 +84,7 @@ const FormSelect = forwardRef<HTMLSelectElement, Props>(
 					<div className="flex space-x-2">
 						{selected.slice(0, 2).map((item, i) => (
 							<Badge size="xs" variant="subtle" color="primary" key={i}>
-								{item.text}
+								{item.label}
 							</Badge>
 						))}
 						{selected.length > 2 && (
@@ -93,7 +94,7 @@ const FormSelect = forwardRef<HTMLSelectElement, Props>(
 						)}
 					</div>
 				)}
-				{!multiple && selected.length > 0 && selected[0].text}
+				{!multiple && selected.length > 0 && selected[0].label}
 				{selected.length === 0 && placeholder}
 			</Button>
 		));
@@ -112,9 +113,9 @@ const FormSelect = forwardRef<HTMLSelectElement, Props>(
 		}, []);
 
 		return (
-			<div>
+			<div className={rest.className}>
 				<Listbox value={selected} onChange={(item) => handleChange(item as unknown as MenuItem)}>
-					<div ref={node} className="relative w-full">
+					<div ref={node} className="relative">
 						<Listbox.Button as={Btn} />
 						<Transition
 							unmount={false}
@@ -144,7 +145,7 @@ const FormSelect = forwardRef<HTMLSelectElement, Props>(
 												'block truncate'
 											)}
 										>
-											{item.text}
+											{item.label}
 										</span>
 										{isSelected(item) ? (
 											<span className="flex absolute inset-y-0 left-0 items-center pl-1.5">

@@ -45,8 +45,8 @@ export default function HabitComposer({ open, setOpen, habit }: Props) {
 	});
 
 	const categoryMenuItems: MenuItem[] = Object.entries(mappedHabitCategories).map(
-		([value, text]) => ({
-			text,
+		([value, label]) => ({
+			label,
 			value,
 		})
 	);

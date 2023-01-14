@@ -7,7 +7,7 @@ import Modal, { ModalProps } from './Modal';
 import useIsMobile from 'hooks/useMobile';
 
 export type MenuItem = {
-	text: string;
+	label: string;
 	value?: string | boolean | number | null;
 	to?: string;
 	checked?: boolean;
@@ -119,7 +119,7 @@ export function MenuItems({
 	function itemAction(item: MenuItem, i?: number) {
 		if (setOpen) setOpen(false);
 		if (item?.indexAction !== undefined) item?.indexAction(i!);
-		else if (!!item?.action) item?.action(item.value || item.text);
+		else if (!!item?.action) item?.action(item.value || item.label);
 		else return undefined;
 	}
 
@@ -154,7 +154,7 @@ export function MenuItems({
 								}}
 							>
 								{item.icon && <span className="w-5 text-primary">{item.icon}</span>}
-								<span className="">{item.text}</span>
+								<span className="">{item.label}</span>
 							</Clickable>
 						)}
 					</DropdownMenu.Item>

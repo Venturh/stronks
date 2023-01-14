@@ -13,6 +13,7 @@ import useThingy from 'hooks/useThingy';
 import { toCalendarDate } from 'utils/date';
 import { authenticatedRoute } from 'utils/redirects';
 import { trpc } from 'utils/trpc';
+import { toFixed } from 'utils/misc';
 
 export default function Home() {
 	const { data } = trpc.useQuery(['nutrition.index']);
@@ -54,13 +55,13 @@ export default function Home() {
 							ref={(el) => (dateRefs.current[i] = el)}
 							key={month}
 						>
-							<StackedListHeader primary={month}>
+							<div>
 								<StackedList grouped>
 									{Object.entries(grouped).map(([measuredAt, items]) => (
 										<StackedListHeader
 											key={measuredAt}
 											primary={toCalendarDate(measuredAt)}
-											seconary={`${sumBy(items, 'calories')} kcal`}
+											seconary={`${toFixed(sumBy(items, 'calories'), 0, 0)} kcal`}
 										>
 											{items
 												.sort((a, b) => priority[b.category] - priority[a.category])
@@ -72,13 +73,13 @@ export default function Home() {
 														key={i}
 														primary={foodnames}
 														secondary={category}
-														tertiary={`${calories} kcal`}
+														tertiary={`${toFixed(calories, 0, 0)} kcal`}
 													/>
 												))}
 										</StackedListHeader>
 									))}
 								</StackedList>
-							</StackedListHeader>
+							</div>
 						</div>
 					);
 				})}

@@ -4,7 +4,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 
 import { db } from 'lib/prisma';
-import { Account, User } from '@prisma/client';
+import { Account } from '@prisma/client';
 import dayjs from 'dayjs';
 
 export interface NextAuthUserWithStringId extends NextAuthUser {
@@ -83,20 +83,8 @@ const createOptions = (req: NextApiRequest): NextAuthOptions => ({
 			return baseUrl;
 		},
 		async session({ session, user }) {
-			const userAgent = req.headers['user-agent'];
-			const sessionToken =
-				req.cookies['__Secure-next-auth.session-token'] || req.cookies['next-auth.session-token'];
-
-			if (sessionToken && !session.userAgent && !userAgent?.includes('node-fetch')) {
-				await db.session.update({
-					where: { sessionToken },
-					data: { userAgent },
-				});
-			}
 			if (session.user) {
-				session.user = user as User;
-				//@ts-expect-error yep
-				session.id = (await db.session.findUnique({ where: { sessionToken } }))?.id;
+				session.user.id = user.id;
 			}
 
 			//TODO somehow get expires_at from refresh token
@@ -109,7 +97,7 @@ const createOptions = (req: NextApiRequest): NextAuthOptions => ({
 
 			if (account) {
 				const accessTokenExpires = account.expires_at ?? 0;
-
+				console.log('accessTokenExpires', accessTokenExpires);
 				if (Date.now() > accessTokenExpires * 1000) {
 					const { expires_at } = await refreshAccessToken(account);
 					session.expires_at = expires_at!;
