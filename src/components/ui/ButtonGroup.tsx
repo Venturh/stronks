@@ -27,7 +27,7 @@ export default function ButtonGroup({ items, disabled, color = 'secondary' }: Pr
 				leftIcon={items[0].icon}
 				disabled={disabled}
 			>
-				{items[0].text}
+				{items[0].label}
 			</Button>
 			<Menu menuItems={items.slice(1)}>
 				<IconButton
