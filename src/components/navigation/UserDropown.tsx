@@ -33,22 +33,22 @@ export default function UserDropdown({ imageOnly }: Props) {
 
 	const dropdownItems = [
 		{
-			text: 'Sync Data',
+			label: 'Sync Data',
 			icon: <RefreshIcon />,
 			// loading: sync.isLoading,
 			action: async () => await sync.mutateAsync(),
 		},
-		{ text: 'Settings', icon: <CogIcon />, to: '/settings/sync' },
-		{ text: 'Sign Out', icon: <LogoutIcon />, action: () => signOut() },
+		{ label: 'Settings', icon: <CogIcon />, to: '/settings/sync' },
+		{ label: 'Sign Out', icon: <LogoutIcon />, action: () => signOut() },
 	];
 	const phaseItems: MenuItem[] = [
 		{
-			text: data?.phase?.toLowerCase() ?? 'Phase',
+			label: data?.phase?.toLowerCase() ?? 'Phase',
 			icon: <BookmarkIcon />,
 			nested: [
-				{ text: 'Maintain', action: () => onPhaseChange(Phase.MAINTAIN) },
-				{ text: 'Cutting', action: () => onPhaseChange(Phase.CUTTING) },
-				{ text: 'Bulking', action: () => onPhaseChange(Phase.BULKING) },
+				{ label: 'Maintain', action: () => onPhaseChange(Phase.MAINTAIN) },
+				{ label: 'Cutting', action: () => onPhaseChange(Phase.CUTTING) },
+				{ label: 'Bulking', action: () => onPhaseChange(Phase.BULKING) },
 			],
 		},
 	];
