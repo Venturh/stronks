@@ -3,20 +3,20 @@ import { useState } from 'react';
 import Switch from 'components/ui/Switch';
 import { DescriptionList } from 'components/ui/DescripitonList';
 
-import { trpc } from 'utils/trpc';
+import { api } from 'utils/api';
 
 export default function Sync() {
-	const { data } = trpc.useQuery(['syncSettings.data']);
+	const { data } = api.syncSettings.data.useQuery();
 
-	const utils = trpc.useContext();
+	const utils = api.useContext();
 
-	const toggle = trpc.useMutation('syncSettings.toggle', {
+	const toggle = api.syncSettings.toggle.useMutation({
 		async onSuccess() {
-			await utils.invalidateQueries(['syncSettings.data']);
+			await utils.syncSettings.data.invalidate();
 		},
 	});
 
-	const sync = trpc.useMutation(['fit.retrieveFitnessData']);
+	const sync = api.fit.retrieveFitnessData.useMutation();
 
 	const [syncMeasurements, setSyncMeasurements] = useState(data?.syncMeasurements ?? false);
 	const [syncSteps, setSyncSteps] = useState(data?.syncSteps ?? false);

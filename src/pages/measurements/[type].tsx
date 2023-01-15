@@ -8,7 +8,7 @@ import { StackedList, StackedListHeader, StackedListItem } from 'components/ui/S
 import WeekTrackCard from 'components/WeekTrackCard';
 import Tabs from 'components/ui/Tabs';
 
-import { trpc } from 'utils/trpc';
+import { api } from 'utils/api';
 import { authenticatedRoute } from 'utils/redirects';
 import { toCalendarDate } from 'utils/date';
 import useThingy from 'hooks/useThingy';
@@ -22,10 +22,7 @@ export default function Weights() {
 	const { query } = useRouter();
 	const type = query.type as 'weight' | 'bodyFat';
 	const [chartInterval, setChartInverval] = useState(30);
-	const { data, isLoading } = trpc.useQuery([
-		'measurements.index',
-		{ interval: chartInterval, type },
-	]);
+	const { data, isLoading } = api.measurements.index.useQuery({ interval: chartInterval, type });
 	const typeTabs = [
 		{ label: 'Weight', href: '/measurements/weight' },
 		{ label: 'Bodyfat', href: '/measurements/bodyFat' },
@@ -33,7 +30,7 @@ export default function Weights() {
 
 	const { dateRefs, tabs, selectedTab } = useThingy(data?.items);
 
-	function getValue(measurments: Omit<Measurements, 'userId' | 'infoId'>[], idx: number) {
+	function getValue(measurments: Omit<Measurements, 'uzserId' | 'infoId'>[], idx: number) {
 		const current = measurments[idx][type];
 		const prev = measurments[idx + 1] ? measurments[idx + 1][type] : undefined;
 		const m = type === 'weight' ? 'kg' : '%';

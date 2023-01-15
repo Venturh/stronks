@@ -36,7 +36,7 @@ export function Error({
 				})}
 			>
 				{withName && <span className="capitalize">{name}: </span>}
-				<span> {error.message}</span>
+				<span> {error.message?.toString()}</span>
 			</div>
 		);
 	} else return null;

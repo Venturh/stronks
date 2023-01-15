@@ -6,7 +6,7 @@ import Button from 'components/ui/Button';
 import Select from 'components/ui/Select';
 import Checkbox from 'components/ui/Checkbox';
 
-import { trpc } from 'utils/trpc';
+import { api } from 'utils/api';
 import { mappedPhases } from 'utils/phase';
 
 type Props = {
@@ -16,18 +16,17 @@ type Props = {
 };
 
 export default function OverviewEditModal({ filterIds, visibleHabits, onChange }: Props) {
-	const update = trpc.useMutation('overview.bulk-update');
-	const context = trpc.useContext();
+	const update = api.overview.bulkUpdate.useMutation({
+		onSuccess: async () => await context.overview.index.invalidate(),
+	});
+	const context = api.useContext();
 
 	const [phase, setSelectedPhase] = useState<Phase>(Phase.MAINTAIN);
 	const [selectedHabits, setSelectedHabits] = useState<string[]>([]);
 
 	async function submit() {
-		await update.mutateAsync(
-			{ infoIds: filterIds, phase, habitIds: selectedHabits },
-			{ onSuccess: async () => await context.invalidateQueries(['overview.index']) }
-		);
-		context.invalidateQueries(['overview.index']);
+		await update.mutateAsync({ infoIds: filterIds, phase, habitIds: selectedHabits });
+		await context.overview.index.invalidate();
 		setSelectedHabits([]);
 		setSelectedPhase(Phase.MAINTAIN);
 		onChange();

@@ -9,7 +9,7 @@ import Card from 'components/ui/Card';
 import IconButton from 'components/ui/IconButton';
 
 import { authenticatedRoute } from 'utils/redirects';
-import { trpc } from 'utils/trpc';
+import { api } from 'utils/api';
 import { toFixed } from 'utils/misc';
 import Button from 'components/ui/Button';
 import NutritionComposer from 'components/nutrition/NutritionComposer';
@@ -20,9 +20,9 @@ export default function Home() {
 
 	const [showStoreModal, setShowStoreModal] = useState(false);
 
-	const utils = trpc.useContext();
-	const { data, error } = trpc.useQuery(['nutrition.show', { category, measuredFormat: date }]);
-	const removeMutation = trpc.useMutation(['nutrition.delete']);
+	const utils = api.useContext();
+	const { data, error } = api.nutrition.show.useQuery({ category, measuredFormat: date });
+	const removeMutation = api.nutrition.delete.useMutation();
 
 	console.log(data);
 
@@ -65,18 +65,7 @@ export default function Home() {
 										size="xs"
 										color="error"
 										icon={<XIcon />}
-										onClick={async () =>
-											await removeMutation.mutateAsync(
-												{ id },
-												{
-													onSuccess: () =>
-														utils.invalidateQueries([
-															'nutrition.show',
-															{ category, measuredFormat: date },
-														]),
-												}
-											)
-										}
+										onClick={async () => await removeMutation.mutateAsync({ id })}
 									/>
 								}
 							/>

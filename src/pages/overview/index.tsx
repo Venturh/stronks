@@ -8,21 +8,21 @@ import EmptyState from 'components/ui/EmptyState';
 
 import { useDatePicker } from 'hooks/useDatePicker';
 import { authenticatedRoute } from 'utils/redirects';
-import { trpc } from 'utils/trpc';
+import { api } from 'utils/api';
 
 export default function Overview() {
 	const { startDate, endDate, onDateChange } = useDatePicker();
 
-	const { data } = trpc.useQuery([
-		'overview.index',
-		{ from: startDate?.toISOString(), to: endDate?.toISOString() },
-	]);
+	const { data } = api.overview.index.useQuery({
+		from: startDate?.toISOString(),
+		to: endDate?.toISOString(),
+	});
 
-	const utils = trpc.useContext();
+	const utils = api.useContext();
 
-	const sync = trpc.useMutation(['fit.retrieveFitnessData'], {
+	const sync = api.fit.retrieveFitnessData.useMutation({
 		onSuccess: () => {
-			utils.invalidateQueries(['overview.index']);
+			utils.overview.index.invalidate();
 		},
 	});
 

@@ -12,11 +12,11 @@ import WeekTrackCard from 'components/WeekTrackCard';
 import useThingy from 'hooks/useThingy';
 import { toCalendarDate } from 'utils/date';
 import { authenticatedRoute } from 'utils/redirects';
-import { trpc } from 'utils/trpc';
+import { api } from 'utils/api';
 import { toFixed } from 'utils/misc';
 
 export default function Home() {
-	const { data } = trpc.useQuery(['nutrition.index']);
+	const { data } = api.nutrition.index.useQuery();
 
 	const [showStoreModal, setShowStoreModal] = useState(false);
 
@@ -41,7 +41,7 @@ export default function Home() {
 				<WeekTrackCard
 					days={data?.stats.days}
 					primary={data?.stats.primary}
-					secondary={`${data?.stats.secondary} kcal per day`}
+					secondary={`${data?.stats.secondary ?? '-'} kcal per day`}
 				/>
 			</div>
 			<StackedList grouped>

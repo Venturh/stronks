@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { createHabitSchema, mappedHabitCategories, updateHabitSchema } from 'shared/habits';
-import { trpc } from 'utils/trpc';
+import { api } from 'utils/api';
 
 const FormModal = dynamic(() => import('components/ui/FormModal'), { ssr: false });
 
@@ -29,16 +29,16 @@ export default function HabitComposer({ open, setOpen, habit }: Props) {
 		form.reset();
 	}
 
-	const context = trpc.useContext();
-	const mutation = trpc.useMutation([habit ? 'habits.update' : 'habits.store'], {
+	const context = api.useContext();
+	const mutation = api.habits[habit ? 'update' : 'store'].useMutation({
 		onSuccess: () => {
-			if (habit) context.invalidateQueries(['habits.show']);
-			else context.invalidateQueries(['habits.index']);
+			if (habit) context.habits.show.invalidate();
+			else context.habits.index.invalidate();
 			resetForm();
 		},
 	});
 
-	const deleteHabit = trpc.useMutation('habits.delete', {
+	const deleteHabit = api.habits.delete.useMutation({
 		onSuccess: () => {
 			push('/habits');
 		},

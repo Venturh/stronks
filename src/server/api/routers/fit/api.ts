@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import dayjs from 'dayjs';
-import { db } from 'lib/prisma';
+import { db } from 'server/db';
 import { AggregatedDataSourceResponse, DataSourceResponse, FitSession } from './types';
 
 export async function getSessionData(accessToken: string) {

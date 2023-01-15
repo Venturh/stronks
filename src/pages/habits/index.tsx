@@ -6,14 +6,14 @@ import { StackedList, StackedListHeader, StackedListItem } from 'components/ui/S
 import { authenticatedRoute } from 'utils/redirects';
 import Button from 'components/ui/Button';
 import { useState } from 'react';
-import { trpc } from 'utils/trpc';
+import { api } from 'utils/api';
 import HabitComposer from 'components/habits/HabitsComposer';
 import { mappedHabitCategories } from 'shared/habits';
 
 export default function Habits() {
 	const [showStoreModal, setShowStoreModal] = useState(false);
 
-	const { data } = trpc.useQuery(['habits.index']);
+	const { data } = api.habits.index.useQuery();
 
 	return (
 		<AppLayout
@@ -26,7 +26,11 @@ export default function Habits() {
 						<StackedListHeader key={i} primary={mappedHabitCategories[category as HabitCategory]}>
 							{habits.map(({ id, emote, name }) => {
 								return (
-									<StackedListItem key={id} primary={`${emote} ${name}`} href={`/habits/${id}`} />
+									<StackedListItem
+										key={id}
+										primary={`${emote ?? ''} ${name}`}
+										href={`/habits/${id}`}
+									/>
 								);
 							})}
 						</StackedListHeader>

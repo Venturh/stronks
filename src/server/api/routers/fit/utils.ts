@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import uuidByString from 'uuid-by-string';
 
-import { db } from 'lib/prisma';
+import { db } from 'server/db';
 import { getAggregatedData, getDatasetData } from './api';
 
 import { toStartOfDay } from 'utils/date';

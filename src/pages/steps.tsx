@@ -7,10 +7,10 @@ import { toCalendarDate } from 'utils/date';
 
 import { toFixed } from 'utils/misc';
 import { authenticatedRoute } from 'utils/redirects';
-import { trpc } from 'utils/trpc';
+import { api } from 'utils/api';
 
 export default function Home() {
-	const { data } = trpc.useQuery(['steps.index']);
+	const { data } = api.steps.index.useQuery();
 
 	const { dateRefs, tabs, selectedTab } = useThingy(data?.items);
 
@@ -21,7 +21,7 @@ export default function Home() {
 				<WeekTrackCard
 					days={data?.stats.days}
 					primary={data?.stats.primary}
-					secondary={`${data?.stats.secondary} steps per day`}
+					secondary={`${data?.stats.secondary ?? '-'} steps per day`}
 				/>
 			</div>
 			<StackedList grouped>

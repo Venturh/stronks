@@ -12,7 +12,7 @@ export type NavLink = {
 	name: string;
 	description: string;
 	href: string;
-	icon: React.ReactNode;
+	icon: any;
 	protected: boolean;
 };
 
@@ -74,17 +74,17 @@ export default function LandingNavigation() {
 									<div className="flex space-x-4">
 										{filteredNavLinks(navLinks, Boolean(data?.user)).map((link) => {
 											return (
-												<Link href={link.href} key={link.name}>
-													<a
-														className={clsx(
-															pathname.startsWith(`/${link.href.split('/')[1]}`)
-																? 'bg-accent-primary text-primary'
-																: 'text-primary hover:bg-accent-secondary hover:text-secondary',
-															'p-2 text-sm font-medium rounded-lg'
-														)}
-													>
-														{link.name}
-													</a>
+												<Link
+													className={clsx(
+														pathname.startsWith(`/${link.href.split('/')[1]}`)
+															? 'bg-accent-primary text-primary'
+															: 'text-primary hover:bg-accent-secondary hover:text-secondary',
+														'p-2 text-sm font-medium rounded-lg'
+													)}
+													href={link.href}
+													key={link.name}
+												>
+													{link.name}
 												</Link>
 											);
 										})}

@@ -6,13 +6,13 @@ import { toFixed } from 'utils/misc';
 import { mappedMoods } from 'utils/mood';
 import { mappedPhases } from 'utils/phase';
 import { authenticatedRoute } from 'utils/redirects';
-import { trpc } from 'utils/trpc';
+import { api } from 'utils/api';
 
 export default function OverviewDay() {
 	const { query } = useRouter();
 	const id = query.id as string;
 
-	const { data } = trpc.useQuery(['overview.show', { id }]);
+	const { data } = api.overview.show.useQuery({ id });
 
 	const weight = data?.info?.measurements[0]?.weight;
 	const bodyFat = data?.info?.measurements[0]?.bodyFat;

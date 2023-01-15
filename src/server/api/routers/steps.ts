@@ -1,14 +1,14 @@
-import { createRouter } from 'server/createRouter';
+import { createTRPCRouter, protectedProcedure } from '../trpc';
 
-import { db } from 'lib/prisma';
+import { db } from 'server/db';
 import { groupBy, sumBy } from 'lodash';
 import { getMonth } from 'utils/date';
 import dayjs from 'dayjs';
 import { generateWeekyDayTrack } from 'server/utils/misc';
 import { toFixed } from 'utils/misc';
 
-export const stepsRouter = createRouter().query('index', {
-	async resolve({ ctx: { user } }) {
+export const stepsRouter = createTRPCRouter({
+	index: protectedProcedure.query(async ({ ctx: { user } }) => {
 		const steps = await db.activitySteps.findMany({
 			where: { userId: user?.id },
 			orderBy: { measuredFormat: 'desc' },
@@ -39,5 +39,5 @@ export const stepsRouter = createRouter().query('index', {
 				secondary: toFixed(stats.secondary / stats.primary, 0, 0),
 			},
 		};
-	},
+	}),
 });

@@ -3,7 +3,7 @@ import Input from 'components/ui/Input';
 import dayjs from 'dayjs';
 import { useFormValidation } from 'hooks/useForm';
 import dynamic from 'next/dynamic';
-import { trpc } from 'utils/trpc';
+import { api } from 'utils/api';
 import { z } from 'zod';
 
 const FormModal = dynamic(() => import('components/ui/FormModal'), { ssr: false });
@@ -41,8 +41,8 @@ export default function NutritionComposer({ open, close, now = false }: Props) {
 		form.reset();
 	}
 
-	const utils = trpc.useContext();
-	const storeMutation = trpc.useMutation(['nutrition.store']);
+	const utils = api.useContext();
+	const storeMutation = api.nutrition.store.useMutation();
 
 	return (
 		<FormModal
@@ -57,7 +57,7 @@ export default function NutritionComposer({ open, close, now = false }: Props) {
 				//@ts-expect-error yep
 				await storeMutation.mutateAsync(data, {
 					onSuccess: () => {
-						utils.invalidateQueries(['nutrition.index']);
+						utils.nutrition.index.invalidate();
 						resetForm();
 					},
 				});

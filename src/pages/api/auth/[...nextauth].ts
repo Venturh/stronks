@@ -1,11 +1,11 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import NextAuth, { NextAuthOptions, User as NextAuthUser } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 
-import { db } from 'lib/prisma';
-import { Account } from '@prisma/client';
+import { db } from 'server/db';
+
 import dayjs from 'dayjs';
+import { Account } from '@prisma/client';
 
 export interface NextAuthUserWithStringId extends NextAuthUser {
 	id: string;
@@ -56,7 +56,7 @@ async function refreshAccessToken(account: Account) {
 	}
 }
 
-const createOptions = (req: NextApiRequest): NextAuthOptions => ({
+export const authOptions: NextAuthOptions = {
 	providers: [
 		GoogleProvider({
 			clientId: process.env.GOOGLE_CLIENT_ID ?? '',
@@ -141,7 +141,6 @@ const createOptions = (req: NextApiRequest): NextAuthOptions => ({
 
 	debug: false,
 	adapter: PrismaAdapter(db),
-});
+};
 
-export default async (req: NextApiRequest, res: NextApiResponse) =>
-	NextAuth(req, res, createOptions(req));
+export default NextAuth(authOptions);

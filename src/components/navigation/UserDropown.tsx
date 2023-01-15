@@ -10,7 +10,7 @@ import {
 
 import NestedMenu from 'components/ui/NestedMenu';
 import { MenuItem } from 'components/ui/Menu';
-import { trpc } from 'utils/trpc';
+import { api } from 'utils/api';
 import { Phase } from '@prisma/client';
 import Button from 'components/ui/Button';
 
@@ -19,15 +19,15 @@ type Props = {
 };
 
 export default function UserDropdown({ imageOnly }: Props) {
-	const { data } = trpc.useQuery(['user.me']);
+	const { data } = api.user.me.useQuery();
 
-	const context = trpc.useContext();
+	const utils = api.useContext();
 
-	const sync = trpc.useMutation(['fit.retrieveFitnessData']);
+	const sync = api.fit.retrieveFitnessData.useMutation();
 
-	const changePase = trpc.useMutation('user.edit', {
+	const changePase = api.user.edit.useMutation({
 		async onSuccess() {
-			context.invalidateQueries(['user.me']);
+			utils.user.me.invalidate();
 		},
 	});
 

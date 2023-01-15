@@ -102,7 +102,7 @@ export default function Modal({
 										{children}
 									</div>
 								</div>
-								<div className="p-1 mt-2 overflow-x-scroll">{actionSlot}</div>
+								<div className="p-1 mt-2 ">{actionSlot}</div>
 							</div>
 						</div>
 					</Transition.Child>

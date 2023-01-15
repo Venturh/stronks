@@ -1,5 +1,3 @@
-import { useRef } from 'react';
-
 import AppLayout from 'components/layouts/AppLayout';
 import { StackedList, StackedListHeader, StackedListItem } from 'components/ui/StackedList';
 import Tabs from 'components/ui/Tabs';
@@ -9,10 +7,10 @@ import useThingy from 'hooks/useThingy';
 import { toCalendarDate } from 'utils/date';
 import { toFixed, toHoursAndMinutes } from 'utils/misc';
 import { authenticatedRoute } from 'utils/redirects';
-import { trpc } from 'utils/trpc';
+import { api } from 'utils/api';
 
 export default function Workouts() {
-	const { data } = trpc.useQuery(['workouts.index']);
+	const { data } = api.workouts.index.useQuery();
 
 	const { dateRefs, tabs, selectedTab } = useThingy(data?.items);
 

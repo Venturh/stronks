@@ -69,7 +69,7 @@ export default function NestedMenu({ menuItems, children, ...rest }: Props) {
 									)}
 									{item.nested && (
 										<DropdownMenuPrimitive.Root>
-											<DropdownMenuPrimitive.TriggerItem
+											<DropdownMenuPrimitive.Trigger
 												className={clsx(
 													'flex w-full cursor-default select-none items-center rounded-md px-2 py-2 text-sm outline-none',
 													'text-primary focus:bg-accent-secondary'
@@ -78,7 +78,7 @@ export default function NestedMenu({ menuItems, children, ...rest }: Props) {
 												<span className="mr-2 h-3.5 w-3.5">{item.icon}</span>
 												<span className="flex-grow capitalize text-primary">{item.label}</span>
 												<ChevronRightIcon className="h-3.5 w-3.5" />
-											</DropdownMenuPrimitive.TriggerItem>
+											</DropdownMenuPrimitive.Trigger>
 											<DropdownMenuPrimitive.Content
 												className={clsx(
 													'ml-3 origin-radix-dropdown-menu radix-side-right:animate-scale-in',

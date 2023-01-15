@@ -1,6 +1,6 @@
-import { db } from 'lib/prisma';
+import { db } from 'server/db';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { syncData } from 'server/routers/fit/router';
+import { syncData } from 'server/api/routers/fit/router';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 	try {

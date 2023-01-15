@@ -1,13 +1,14 @@
-import { createRouter } from 'server/createRouter';
 import { groupBy, sumBy } from 'lodash';
 import dayjs from 'dayjs';
 
-import { db } from 'lib/prisma';
+import { createTRPCRouter, protectedProcedure } from '../trpc';
+
+import { db } from 'server/db';
 import { getMonth } from 'utils/date';
 import { generateWeekyDayTrack } from 'server/utils/misc';
 
-export const workoutsRouter = createRouter().query('index', {
-	async resolve({ ctx: { user } }) {
+export const workoutsRouter = createTRPCRouter({
+	index: protectedProcedure.query(async ({ ctx: { user } }) => {
 		const workouts = await db.workouts.findMany({
 			where: { userId: user?.id },
 			orderBy: { measuredAt: 'desc' },
@@ -28,5 +29,5 @@ export const workoutsRouter = createRouter().query('index', {
 
 		const items = groupBy(workouts, (d) => getMonth(d));
 		return { items, stats: { ...stats, days } };
-	},
+	}),
 });

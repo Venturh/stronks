@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
 import {
+	ColumnDef,
 	ColumnOrderState,
-	createTable,
+	flexRender,
 	getCoreRowModel,
-	useTableInstance,
+	useReactTable,
 	VisibilityState,
 } from '@tanstack/react-table';
 import { Habits, Mood, Phase } from '@prisma/client';
@@ -18,7 +19,7 @@ import OverviewEditModal from './OverviewEditModal';
 import Checkbox from 'components/ui/Checkbox';
 import CheckboxDiv from 'components/ui/CheckDiv';
 
-import { trpc } from 'utils/trpc';
+import { api } from 'utils/api';
 import { mappedShortPhases, phaseBorderColors, phaseColors } from 'utils/phase';
 
 import { OverviewData } from 'types';
@@ -32,11 +33,11 @@ type Props = {
 	orderOverviewColumns: string[];
 	habits: Habits[];
 };
-const table = createTable().setRowType<Partial<OverviewData>>();
 
-const defaultColumns = [
-	table.createDisplayColumn({
+const defaultColumns: ColumnDef<OverviewData>[] = [
+	{
 		id: 'toggle',
+		accessorKey: 'toggle',
 		cell: ({ row }) => (
 			<Checkbox
 				color="secondary"
@@ -44,45 +45,62 @@ const defaultColumns = [
 				onChange={row.getToggleSelectedHandler()}
 			/>
 		),
-		header: ({ instance }) => (
+		header: ({ table }) => (
 			<Checkbox
 				color="secondary"
-				checked={instance.getIsAllRowsSelected()}
-				onChange={instance.getToggleAllRowsSelectedHandler()}
+				checked={table.getIsAllRowsSelected()}
+				onChange={table.getToggleAllRowsSelectedHandler()}
 			/>
 		),
 		enableSorting: false,
-	}),
-	table.createDataColumn('date', {
+	},
+	{
+		accessorKey: 'date',
+		id: 'date',
+		header: 'Date',
 		cell: (info) => info.getValue(),
-	}),
-	table.createDataColumn('mood', {
+	},
+	{
+		accessorKey: 'Mood',
+		id: 'mood',
 		cell: ({ cell }) => <MoodCell {...cell} />,
-	}),
-	table.createDataColumn('phase', {
-		header: () => 'Phase',
+	},
+	{
+		header: 'Phase',
+		accessorKey: 'phase',
+		id: 'phase',
 		cell: ({ cell }) => <PhaseCell {...cell} />,
-	}),
-	table.createDataColumn('calories', {
+	},
+	{
 		header: 'Calories',
+		accessorKey: 'calories',
+		id: 'calories',
 		cell: (info) => info.getValue() ?? '-',
-	}),
-	table.createDataColumn('weight', {
-		header: () => 'Weight',
+	},
+	{
+		header: 'Weight',
+		accessorKey: 'weight',
+		id: 'weight',
 		cell: (info) => info.getValue() ?? '-',
-	}),
-	table.createDataColumn('bodyFat', {
-		header: 'Body fat',
+	},
+	{
+		accessorKey: 'bodyFat',
+		id: 'bodyFat',
+		header: 'Body Fat',
 		cell: (info) => info.getValue() ?? '-',
-	}),
-	table.createDataColumn('training', {
+	},
+	{
 		header: 'Training',
-		cell: ({ cell, instance }) => <CheckboxDivCell disabled {...cell} instance={instance} />,
-	}),
-	table.createDataColumn('notes', {
+		accessorKey: 'training',
+		id: 'training',
+		cell: ({ cell, table }) => <CheckboxDivCell disabled {...cell} table={table} />,
+	},
+	{
 		header: 'Notes',
-		cell: ({ cell, instance }) => <TextCell {...cell} instance={instance} />,
-	}),
+		accessorKey: 'notes',
+		id: 'notes',
+		cell: ({ cell, table }) => <TextCell {...cell} table={table} />,
+	},
 ];
 
 export default function OverviewTable({
@@ -91,47 +109,41 @@ export default function OverviewTable({
 	orderOverviewColumns,
 	habits,
 }: Props) {
-	const orderOverviewColumnsWithCheckboxDiv = ['toggle', ...orderOverviewColumns];
-
-	const initialVisibility = orderOverviewColumnsWithCheckboxDiv.reduce<Record<string, any>>(
-		(acc, curr) => {
-			acc[curr] = hiddenTableHeaders.includes(curr) ? false : true;
-			return acc;
-		},
-		{}
-	);
+	const initialVisibility = orderOverviewColumns.reduce<Record<string, any>>((acc, curr) => {
+		acc[curr] = hiddenTableHeaders.includes(curr) ? false : true;
+		return acc;
+	}, {});
 
 	const [data] = React.useState(() => [...items]);
 
-	const habitColumns = habits.map(({ name, id }) =>
-		// @ts-ignore
-		table.createDataColumn(id, {
-			header: () => name,
+	const habitColumns: ColumnDef<OverviewData>[] = habits.map(({ name, id }) => ({
+		id,
+		header: () => name,
+		cell: ({ cell, table }) => (
 			// @ts-ignore
-			cell: ({ cell, instance }) => (
-				<CheckboxDivCell isHabit updateKey={id} {...cell} instance={instance} />
-			),
-		})
-	);
+			<CheckboxDivCell isHabit updateKey={id} {...cell} table={table} />
+		),
+	}));
 
 	const [columns] = React.useState<typeof defaultColumns>(() => [
 		...defaultColumns,
 		...habitColumns,
 	]);
+
 	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(initialVisibility);
-	const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
-		orderOverviewColumnsWithCheckboxDiv
-	);
+	const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(orderOverviewColumns);
+
 	const [columnVisibilityList, setColumnVisibilityList] = useState<ItemInterface[]>(
 		Object.entries(columnVisibility).map(([id, visible]) => ({ id, visible }))
 	);
 
 	const [open, setOpen] = useState(false);
 
-	const editUser = trpc.useMutation('user.edit');
+	const editUser = api.user.edit.useMutation();
 
 	const [rowSelection, setRowSelection] = useState({});
-	const instance = useTableInstance(table, {
+
+	const table = useReactTable<OverviewData>({
 		data,
 		columns,
 		state: {
@@ -141,6 +153,7 @@ export default function OverviewTable({
 		},
 		onRowSelectionChange: setRowSelection,
 		onColumnVisibilityChange: setColumnVisibility,
+		onColumnOrderChange: setColumnOrder,
 		getCoreRowModel: getCoreRowModel(),
 	});
 
@@ -178,14 +191,16 @@ export default function OverviewTable({
 			<div className="block max-h-screen overflow-x-auto ">
 				<table className="relative min-w-full overflow-x-scroll divide-y shadow table-fixed divide-accent-primary ring-1 bg-secondary ring-accent-primary md:rounded-lg">
 					<thead>
-						{instance.getHeaderGroups().map((headerGroup) => (
+						{table.getHeaderGroups().map((headerGroup) => (
 							<tr
 								className="sticky top-0 z-10 font-medium tracking-wider text-left uppercase bg-secondary text-xxs text-primary"
 								key={headerGroup.id}
 							>
 								{headerGroup.headers.map((header) => (
 									<th className="px-2 py-3" key={header.id} colSpan={header.colSpan}>
-										{header.isPlaceholder ? null : header.renderHeader()}
+										{header.isPlaceholder
+											? null
+											: flexRender(header.column.columnDef.header, header.getContext())}
 									</th>
 								))}
 								<th>
@@ -201,7 +216,7 @@ export default function OverviewTable({
 						))}
 					</thead>
 					<tbody className="relative divide-y divide-accent-primary">
-						{instance.getRowModel().rows.map((row) => (
+						{table.getRowModel().rows.map((row) => (
 							<tr className="" key={row.id}>
 								{row.getVisibleCells().map((cell, index) => (
 									<td
@@ -211,7 +226,7 @@ export default function OverviewTable({
 										)}
 										key={cell.id}
 									>
-										{cell.renderCell()}
+										{flexRender(cell.column.columnDef.cell, cell.getContext())}
 									</td>
 								))}
 								<td
@@ -266,7 +281,7 @@ export default function OverviewTable({
 										<Switch
 											checked={visible}
 											onChange={async () => {
-												instance.getColumn(id as string).toggleVisibility(!visible);
+												table.getColumn(id as string).toggleVisibility(!visible);
 												await editColumVisibility(id as string, !visible);
 											}}
 										/>
@@ -278,9 +293,7 @@ export default function OverviewTable({
 			</SlideOver>
 			<OverviewEditModal
 				filterIds={
-					instance
-						.getSelectedRowModel()
-						.flatRows.flatMap(({ original }) => original!.id) as string[]
+					table.getSelectedRowModel().flatRows.flatMap(({ original }) => original!.id) as string[]
 				}
 				visibleHabits={habits.filter(
 					(h) => columnVisibilityList.find((c) => c.id === h.id)?.visible
@@ -292,7 +305,7 @@ export default function OverviewTable({
 }
 
 function PhaseCell({ row, getValue }: { row: any; getValue: () => any }) {
-	const update = trpc.useMutation('overview.update', {});
+	const update = api.overview.update.useMutation();
 
 	const infoId = row.original!.id;
 	const initalValue = getValue();
@@ -316,7 +329,7 @@ function PhaseCell({ row, getValue }: { row: any; getValue: () => any }) {
 	);
 }
 function MoodCell({ row, getValue }: { row: any; getValue: () => any }) {
-	const update = trpc.useMutation('overview.update');
+	const update = api.overview.update.useMutation();
 
 	const infoId = row.original!.id;
 	const initalValue = getValue();
@@ -338,11 +351,11 @@ function MoodCell({ row, getValue }: { row: any; getValue: () => any }) {
 	);
 }
 
-function TextCell({ getValue, row }: { instance: any; row: any; getValue: () => any }) {
+function TextCell({ getValue, row }: { table: any; row: any; getValue: () => any }) {
 	const infoId = row.original!.id;
 	const initialValue = getValue() as string;
 	const [value, setValue] = useState(initialValue ?? '');
-	const update = trpc.useMutation('overview.update');
+	const update = api.overview.update.useMutation();
 
 	return (
 		<input
@@ -362,7 +375,7 @@ function CheckboxDivCell({
 	isHabit,
 }: {
 	disabled?: boolean;
-	instance: any;
+	table: any;
 	row: any;
 	getValue: () => any;
 	updateKey?: keyof OverviewData;
@@ -371,7 +384,7 @@ function CheckboxDivCell({
 	const infoId = row.original!.id;
 	const initialValue = getValue();
 	const [value, setValue] = useState(initialValue ?? '');
-	const update = trpc.useMutation('overview.update');
+	const update = api.overview.update.useMutation();
 
 	async function onChange(checked: boolean) {
 		if (updateKey) {

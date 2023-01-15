@@ -17,7 +17,7 @@ import UserDropdown from './UserDropown';
 type Item = {
 	name: string;
 	href: string;
-	icon: React.ReactNode;
+	icon: any;
 };
 
 export default function Sidebar() {
@@ -62,25 +62,24 @@ export function SidebarItem({ item, pathname }: { pathname: string; item: Item }
 		return pathname.startsWith(`/${href.split('/')[1]}`);
 	}
 	return (
-		<Link href={item.href} key={item.name}>
-			<a
+		<Link
+			href={item.href}
+			key={item.name}
+			className={clsx(
+				checkActive(item.href)
+					? 'bg-accent-primary text-primary'
+					: 'text-secondary  hover:bg-accent-secondary',
+				'group py-2 px-3 flex items-center text-sm font-medium rounded-md'
+			)}
+		>
+			<item.icon
 				className={clsx(
-					checkActive(item.href)
-						? 'bg-accent-primary text-primary'
-						: 'text-secondary  hover:bg-accent-secondary',
-					'group py-2 px-3 flex items-center text-sm font-medium rounded-md'
+					{ 'text-brand-primary': checkActive(item.href) },
+					'mr-3 flex-shrink-0 h-5 w-5'
 				)}
-			>
-				{/* @ts-expect-error yep */}
-				<item.icon
-					className={clsx(
-						{ 'text-brand-primary': checkActive(item.href) },
-						'mr-3 flex-shrink-0 h-5 w-5'
-					)}
-					aria-hidden="true"
-				/>
-				{item.name}
-			</a>
+				aria-hidden="true"
+			/>
+			{item.name}
 		</Link>
 	);
 }

@@ -2,7 +2,7 @@ import { CheckCircleIcon } from '@heroicons/react/solid';
 import { Habits } from '@prisma/client';
 import clsx from 'clsx';
 import { mappedHabitCategories } from 'shared/habits';
-import { trpc } from 'utils/trpc';
+import { api } from 'utils/api';
 
 type Props = {
 	habit: Habits;
@@ -11,9 +11,9 @@ type Props = {
 };
 
 export default function HabitCard({ habit, infoId, checked }: Props) {
-	const context = trpc.useContext();
-	const { mutateAsync, isLoading } = trpc.useMutation('habits.complete', {
-		onSuccess: () => context.invalidateQueries(['overview.show', { id: infoId }]),
+	const context = api.useContext();
+	const { mutateAsync, isLoading } = api.habits.complete.useMutation({
+		onSuccess: () => context.overview.show.invalidate({ id: infoId }),
 	});
 	return (
 		<button

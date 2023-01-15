@@ -1,6 +1,7 @@
-import { db } from 'lib/prisma';
-import { Session, User } from 'next-auth';
-import { createRouter } from 'server/createRouter';
+import { db } from 'server/db';
+import { User } from 'next-auth';
+import { createTRPCRouter, protectedProcedure } from 'server/api/trpc';
+
 import {
 	persistWorkoutData,
 	persistActivityStepsData,
@@ -15,11 +16,11 @@ enum FitType {
 	syncWorkout = 'syncWorkout',
 }
 
-export const fitRouter = createRouter().mutation('retrieveFitnessData', {
-	async resolve({ ctx: { session } }) {
+export const fitRouter = createTRPCRouter({
+	retrieveFitnessData: protectedProcedure.mutation(async ({ ctx: { session } }) => {
 		await syncData(session?.user);
 		return 'success';
-	},
+	}),
 });
 
 export async function syncData(user?: User | null) {
@@ -71,24 +72,5 @@ export async function syncData(user?: User | null) {
 					break;
 			}
 		}
-		// await Promise.all(
-		// 	enabledSettings.map(async ({ name, dataSourceId }) => {
-		// 		const accessToken = user.accounts[0].access_token!;
-		// 		switch (name) {
-		// 			case FitType.syncMeasurements:
-		// 				await persistMeasurementsFitData(user.id, accessToken);
-		// 				break;
-		// 			case FitType.syncNutrition:
-		// 				await persistNutritionFitData(dataSourceId, accessToken, user.id);
-		// 				break;
-		// 			case FitType.syncWorkout:
-		// 				await persistWorkoutData(accessToken, user.id);
-		// 				break;
-		// 			case FitType.syncSteps:
-		// 				await persistActivityStepsData(accessToken, user.id);
-		// 				break;
-		// 		}
-		// 	})
-		// );
 	}
 }

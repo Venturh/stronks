@@ -26,7 +26,7 @@ const Clickable = forwardRef<any, ClickableProps>(
 		);
 		if (isLink) {
 			return (
-				<Link href={href} {...props}>
+				<Link href={href} {...props} legacyBehavior>
 					{content}
 				</Link>
 			);
