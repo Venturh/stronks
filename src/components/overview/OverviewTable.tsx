@@ -118,6 +118,7 @@ export default function OverviewTable({
 
 	const habitColumns: ColumnDef<OverviewData>[] = habits.map(({ name, id }) => ({
 		id,
+		accessorKey: id,
 		header: () => name,
 		cell: ({ cell, table }) => (
 			// @ts-ignore
