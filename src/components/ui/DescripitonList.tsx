@@ -4,7 +4,7 @@ type Props = {
 	title: string;
 	description?: string;
 	children: React.ReactNode;
-	action?: ButtonProps & { onClick: () => void };
+	action?: (ButtonProps & { onClick: () => void })[];
 };
 
 export function DescriptionList({ title, description, action, children }: Props) {
@@ -15,10 +15,14 @@ export function DescriptionList({ title, description, action, children }: Props)
 					<h3 className="text-lg font-medium leading-6 text-primary">{title}</h3>
 					{description && <p className="max-w-2xl text-sm text-secondary">{description}</p>}
 				</div>
-				{action && (
-					<Button className="ml-2" loading={action!.loading} onClick={() => action.onClick()}>
-						{action?.children}
-					</Button>
+				{action?.length && (
+					<div className="flex flex-wrap space-x-2">
+						{action.map(({ children, ...rest }, i) => (
+							<Button key={i} {...rest}>
+								{children}
+							</Button>
+						))}
+					</div>
 				)}
 			</div>
 			<div className="mt-6">

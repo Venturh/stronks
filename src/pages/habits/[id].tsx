@@ -24,13 +24,15 @@ export default function Weights() {
 			<DescriptionList
 				title="Habit"
 				description="Details about the selected habit"
-				action={{
-					children: 'Edit',
-					disabled: !data,
-					onClick: () => {
-						setShowEditModal(true);
+				action={[
+					{
+						children: 'Edit',
+						disabled: !data,
+						onClick: () => {
+							setShowEditModal(true);
+						},
 					},
-				}}
+				]}
 			>
 				<DescriptionListItem label="Name">{data?.name}</DescriptionListItem>
 				<DescriptionListItem label="Emote">{data?.emote ?? '-'}</DescriptionListItem>

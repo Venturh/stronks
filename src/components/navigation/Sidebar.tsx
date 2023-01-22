@@ -7,6 +7,7 @@ import {
 	LightningBoltIcon,
 	CollectionIcon,
 	SwitchHorizontalIcon,
+	CalendarIcon,
 } from '@heroicons/react/outline';
 import clsx from 'clsx';
 
@@ -23,6 +24,7 @@ type Item = {
 export default function Sidebar() {
 	const navigation = [
 		{ name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+		{ name: 'Today', href: '/day', icon: CalendarIcon },
 		{ name: 'Übersicht', href: '/overview', icon: CollectionIcon },
 		{ name: 'Measurements', href: '/measurements/weight', icon: ColorSwatchIcon },
 		{ name: 'Nutrition', href: '/nutrition', icon: BeakerIcon },

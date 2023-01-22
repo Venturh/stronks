@@ -79,7 +79,7 @@ model GoogleFitSetting {
 model Measurements {
     id                    String              @id @default(uuid())
     objectId              String              @unique
-    measuredFormat        DateTime            @unique
+    measuredFormat        DateTime @db.Date            @unique
     measuredAt            DateTime
     weight                Float?
     bodyFat               Float?
@@ -123,7 +123,7 @@ model Nutrition {
     protein            Float?
     originDataSourceId String?
     category           String?
-    measuredFormat     DateTime
+    measuredFormat     DateTime @db.Date
     measuredAt         DateTime
     synced              Boolean  @default(false)
     infoId             String?
@@ -141,7 +141,7 @@ model Workouts {
     duration         Float
     calories         Float?
     measuredAt       DateTime
-    measuredFormat   DateTime
+    measuredFormat   DateTime @db.Date
     appName          String
     activityType     Int
     activityTypeName String
@@ -159,7 +159,7 @@ model ActivitySteps {
     duration       Float?
     calories       Float?
     speed          Float?
-    measuredFormat DateTime
+    measuredFormat DateTime @db.Date
     userId         String
     infoId         String?
     user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -177,7 +177,7 @@ enum Mood {
 
 model Info {
     id             String          @id @default(uuid())
-    measuredFormat DateTime        @unique
+    measuredFormat DateTime @db.Date        @unique
     phase          Phase?          @default(MAINTAIN)
     notes          String?
     userId         String

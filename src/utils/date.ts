@@ -1,10 +1,10 @@
 import dayjs, { Dayjs } from 'dayjs';
 import calendar from 'dayjs/plugin/calendar';
 import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 dayjs.extend(calendar);
 dayjs.extend(timezone);
-
-dayjs.tz.setDefault('Europe/Berlin');
+dayjs.extend(utc);
 
 export function toMidnightDate(time: number) {
 	return dayjs(time).hour(0).minute(0).second(0).millisecond(0).toDate();
@@ -36,4 +36,8 @@ export function toNormalDate(to?: Date, excludeYear?: boolean) {
 }
 export function toNormalDateTime(to: Date) {
 	return dayjs(to).format('DD.MM.YY, HH:mm');
+}
+
+export function toDate(date: Date) {
+	return dayjs(date).format('YYYY-MM-DD');
 }

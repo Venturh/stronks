@@ -5,24 +5,39 @@ import { useRouter } from 'next/router';
 import { toFixed } from 'utils/misc';
 import { mappedMoods } from 'utils/mood';
 import { mappedPhases } from 'utils/phase';
-import { authenticatedRoute } from 'utils/redirects';
 import { api } from 'utils/api';
+import { toCalendarDate } from 'utils/date';
+import dayjs from 'dayjs';
 
 export default function OverviewDay() {
-	const { query } = useRouter();
-	const id = query.id as string;
+	const { query, push } = useRouter();
+	const date = query.date as string;
 
-	const { data } = api.overview.show.useQuery({ id });
+	const { data } = api.overview.show.useQuery({ date });
 
 	const weight = data?.info?.measurements[0]?.weight;
 	const bodyFat = data?.info?.measurements[0]?.bodyFat;
+
+	const nextDay = dayjs.utc(date).add(1, 'day').format('YYYY-MM-DD');
+	const prevDay = dayjs.utc(date).subtract(1, 'day').format('YYYY-MM-DD');
+	const nextDisabled = dayjs.utc(date).isSame(dayjs.utc(), 'day');
 
 	if (data?.info) {
 		const { info, habits } = data;
 		return (
 			<AppLayout title="Overview">
 				{data?.info && (
-					<DescriptionList title={info.measuredFormat.toLocaleDateString()}>
+					<DescriptionList
+						title={toCalendarDate(info.measuredFormat)}
+						action={[
+							{ children: 'Prev', onClick: () => push({ query: { date: prevDay } }) },
+							{
+								children: 'Next',
+								disabled: nextDisabled,
+								onClick: () => push({ query: { date: nextDay } }),
+							},
+						]}
+					>
 						<DescriptionListItem label="Mood">
 							{mappedMoods.find(({ value }) => value === info.mood)?.label}
 						</DescriptionListItem>
@@ -63,8 +78,4 @@ export default function OverviewDay() {
 			</AppLayout>
 		);
 	}
-
-	return <AppLayout title="Overview">Lel</AppLayout>;
 }
-
-export const getServerSideProps = authenticatedRoute;

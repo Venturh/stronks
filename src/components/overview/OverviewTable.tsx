@@ -26,6 +26,7 @@ import { OverviewData } from 'types';
 import { ChevronRightIcon } from '@heroicons/react/outline';
 import Switch from 'components/ui/Switch';
 import { mappedMoods } from 'utils/mood';
+import { toDate, toNormalDate } from 'utils/date';
 
 type Props = {
 	items: OverviewData[];
@@ -58,7 +59,7 @@ const defaultColumns: ColumnDef<OverviewData>[] = [
 		accessorKey: 'date',
 		id: 'date',
 		header: 'Date',
-		cell: (info) => info.getValue(),
+		cell: (info) => toNormalDate(info.getValue() as Date, true),
 	},
 	{
 		accessorKey: 'Mood',
@@ -237,7 +238,10 @@ export default function OverviewTable({
 									)}
 								>
 									<IconButton
-										href={`/overview/${row.original?.id}`}
+										href={{
+											pathname: '/day',
+											query: { date: toDate(row.original?.date) },
+										}}
 										size="xs"
 										fullRounded
 										icon={<ChevronRightIcon />}

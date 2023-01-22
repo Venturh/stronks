@@ -13,7 +13,7 @@ type Props = {
 export default function HabitCard({ habit, infoId, checked }: Props) {
 	const context = api.useContext();
 	const { mutateAsync, isLoading } = api.habits.complete.useMutation({
-		onSuccess: () => context.overview.show.invalidate({ id: infoId }),
+		onSuccess: () => context.overview.show.invalidate(),
 	});
 	return (
 		<button

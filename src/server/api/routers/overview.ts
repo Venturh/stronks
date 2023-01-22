@@ -12,7 +12,7 @@ import { sumBy } from 'lodash';
 import dayjs from 'dayjs';
 import { updateOverviewSchema } from 'shared/overview';
 import { makeApiUuid } from './fit/utils';
-import { idSchema } from 'shared';
+import { dateStringSchema } from 'shared';
 
 export const overviewRouter = createTRPCRouter({
 	index: protectedProcedure
@@ -81,7 +81,7 @@ export const overviewRouter = createTRPCRouter({
 
 				const mappedItem = {
 					id: item.id,
-					date: toNormalDate(item.measuredFormat, true),
+					date: item.measuredFormat,
 					fullDate: toNormalDate(item.measuredFormat),
 					phase: item.phase ?? null,
 					notes: item.notes ?? null,
@@ -103,11 +103,12 @@ export const overviewRouter = createTRPCRouter({
 
 			return { overview, hiddenOverviewColumns, orderOverviewColumns, habits };
 		}),
-	show: protectedProcedure.input(idSchema).query(async ({ ctx, input }) => {
+	show: protectedProcedure.input(dateStringSchema).query(async ({ ctx, input }) => {
 		const { user } = ctx;
-		const { id } = input;
+		const { date } = input;
+
 		const info = await db.info.findUnique({
-			where: { id },
+			where: { measuredFormat: date },
 			include: {
 				nutritions: {
 					select: {

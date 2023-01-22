@@ -1,13 +1,12 @@
-import Link from 'next/link';
+import Link, { LinkProps } from 'next/link';
 import { ComponentProps, ElementType, forwardRef } from 'react';
-import { Url } from 'url';
 
 type ComponentProp = ComponentProps<'button'> & ComponentProps<'a'>;
 
 export interface ClickableProps extends Omit<ComponentProp, 'href'> {
 	out?: boolean;
 	ref?: any;
-	href?: Url | string;
+	href?: LinkProps['href'] | string;
 	as?: ElementType;
 	scroll?: boolean;
 }

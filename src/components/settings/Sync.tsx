@@ -26,11 +26,13 @@ export default function Sync() {
 		<DescriptionList
 			title="Google Fit"
 			description="Define which data you want to sync with Google Fit."
-			action={{
-				loading: sync.isLoading,
-				children: 'Sync latest',
-				onClick: async () => await sync.mutateAsync(),
-			}}
+			action={[
+				{
+					loading: sync.isLoading,
+					children: 'Sync latest',
+					onClick: async () => await sync.mutateAsync(),
+				},
+			]}
 		>
 			<div className="py-4">
 				<Switch

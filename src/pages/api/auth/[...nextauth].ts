@@ -76,6 +76,7 @@ export const authOptions: NextAuthOptions = {
 
 	session: {
 		strategy: 'database',
+		maxAge: 60 * 60,
 	},
 
 	callbacks: {
@@ -87,7 +88,7 @@ export const authOptions: NextAuthOptions = {
 				session.user.id = user.id;
 			}
 
-			//TODO somehow get expires_at from refresh token
+			//TODO somehow get expires_at from session
 			const account = await db.account.findFirst({
 				where: {
 					userId: user.id,
@@ -97,8 +98,9 @@ export const authOptions: NextAuthOptions = {
 
 			if (account) {
 				const accessTokenExpires = account.expires_at ?? 0;
-				console.log('accessTokenExpires', accessTokenExpires);
-				if (Date.now() > accessTokenExpires * 1000) {
+				const expired = Date.now() > accessTokenExpires * 1000;
+				// console.log('accessTokenExpires', expired);
+				if (expired) {
 					const { expires_at } = await refreshAccessToken(account);
 					session.expires_at = expires_at!;
 				}
